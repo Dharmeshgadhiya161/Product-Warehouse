@@ -9,6 +9,9 @@ class SharedPrefManager(private var mContext:Context) {
 
     private val userName = "UserName"
     private val isFirstShow = "FirstShow"
+    private val isExcelDialogShow = "ExcelDialogShow"
+    private val isReadAccountExcel = "ReadAccountExcelShow"
+    private val isReadItemExcel = "ReadItemExcelShow"
 
 
     var getUserName: String?
@@ -21,6 +24,27 @@ class SharedPrefManager(private var mContext:Context) {
         editor.putBoolean(isFirstShow, setFirstShow)
         editor.apply()
     }
+
+    var isExcelFileShowing:Boolean
+        get() = sharedPref.getBoolean(isExcelDialogShow,false)
+        set(setExcelFile) {
+            editor.putBoolean(isExcelDialogShow,setExcelFile)
+            editor.apply()
+        }
+
+    var isAccountExcelRead:Boolean
+        get() = sharedPref.getBoolean(isReadAccountExcel,false)
+        set(setAccountExcelRead) {
+            editor.putBoolean(isReadAccountExcel,setAccountExcelRead)
+            editor.apply()
+        }
+
+    var isItemExcelRead:Boolean
+        get() = sharedPref.getBoolean(isReadItemExcel,false)
+        set(setItemExcelRead) {
+            editor.putBoolean(isReadItemExcel,setItemExcelRead)
+            editor.apply()
+        }
 
     private fun storeString(key: String, value: String?) {
         editor.run {

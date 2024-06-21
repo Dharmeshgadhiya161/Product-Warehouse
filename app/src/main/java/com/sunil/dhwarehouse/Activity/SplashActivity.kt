@@ -14,7 +14,7 @@ import com.sunil.dhwarehouse.R
 import com.sunil.dhwarehouse.common.SharedPrefManager
 
 class SplashActivity : AppCompatActivity() {
-    lateinit var sharedPrefManager: SharedPrefManager
+    private lateinit var sharedPrefManager: SharedPrefManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,19 +30,19 @@ class SplashActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        sharedPrefManager=SharedPrefManager(this@SplashActivity)
+        sharedPrefManager = SharedPrefManager(this@SplashActivity)
 
 
         Handler(Looper.myLooper()!!).postDelayed({
-             if (!sharedPrefManager.getFirstShow){
-                 startActivity(Intent(this@SplashActivity, LoginUserActivity::class.java))
-                 finish()
-             }else{
-                 startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                 finish()
-             }
+            if (!sharedPrefManager.getFirstShow) {
+                startActivity(Intent(this@SplashActivity, LoginUserActivity::class.java))
+                finish()
+            } else {
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+                finish()
+            }
 
-        },3000)
+        }, 3000)
 
     }
 }

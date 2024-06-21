@@ -11,7 +11,7 @@ interface AccountDao {
     suspend fun insert(acount : AccountMaster)
 
     @Query("SELECT * from account_master")
-    suspend fun getAccountMaster() : List<AccountMaster>
+    fun getAccountMaster() : MutableList<AccountMaster>
 
     @Query("DELETE FROM account_master")
     suspend fun deleteAllAccounts()

@@ -8,4 +8,16 @@
     android:background="@drawable/bg_splash"
     tools:context=".Activity.SplashActivity">
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_120sdp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/_10sdp"
+        app:lottie_autoPlay="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:lottie_loop="true"
+        app:lottie_colorFilter="@color/white"
+        app:lottie_rawRes="@raw/loader" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

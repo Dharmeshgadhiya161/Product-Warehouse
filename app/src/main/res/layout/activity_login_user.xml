@@ -9,18 +9,84 @@
     tools:context=".Activity.LoginUserActivity">
 
 
-    <TextView
-        android:id="@+id/btn_Login"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ic_btn_submit"
-       android:layout_marginBottom="10dp"
-        android:layout_marginHorizontal="22dp"
-        android:text="Login"
-        android:gravity="center"
-        android:fontFamily="@font/roboto_bold"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="@dimen/_80sdp"
+            android:layout_height="@dimen/_80sdp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:src="@drawable/iv_user" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="22dp"
+            android:layout_marginBottom="@dimen/_25sdp"
+            android:fontFamily="@font/roboto_bold"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="22dp"
+            android:layout_marginBottom="@dimen/_20sdp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="Please Enter Your Username\nto Login"
+            android:textAlignment="viewStart"
+            android:textColor="#73090F47"
+            android:textSize="16sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/filledTextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="@dimen/_24sdp"
+            app:cursorColor="@color/black"
+            app:cursorErrorColor="@color/black">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edt_userName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:hint="Enter Username"
+                android:inputType="text"
+                android:maxLength="2"
+                android:textColor="@color/black"
+                android:textColorHint="#73090F47"
+                android:textSize="16sp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <TextView
+            android:id="@+id/btn_Login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="22dp"
+            android:layout_marginBottom="@dimen/_25sdp"
+            android:background="@drawable/ic_btn_shedow_blue"
+            android:fontFamily="@font/roboto_bold"
+            android:gravity="center"
+            android:paddingBottom="@dimen/_14sdp"
+            android:text="Login"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -63,6 +63,7 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
-
+    implementation ("com.intuit.sdp:sdp-android:1.1.1")
+    implementation ("com.airbnb.android:lottie:6.4.1")
 
 }

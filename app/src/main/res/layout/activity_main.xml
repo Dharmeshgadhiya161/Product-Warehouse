@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -12,29 +13,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvSelectAccountMaster"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvAllAccount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:gravity="center"
-            android:background="@color/blue"
-            android:textColor="@color/white"
-            android:layout_margin="10dp"
-            android:text="Get Account Master" />
-
-        <TextView
-            android:id="@+id/tvSelectItemMaster"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:gravity="center"
-            android:background="@color/blue"
-            android:textColor="@color/white"
-            android:layout_margin="10dp"
-            android:text="Get Item Master" />
-
+            android:layout_marginTop="@dimen/_5sdp" />
 
     </LinearLayout>
 
-</RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
