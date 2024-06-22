@@ -5,9 +5,28 @@
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorPrimary</item>
-        <item name="android:statusBarColor">#F9F8FD</item>
+        <item name="android:statusBarColor">#F5F5F5</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
+
+    <style name="ThemeMainActivity.DhWareHouse" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+
+
+    <style name="My_textStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="fontFamily">@font/roboto_medium</item>
+        <item name="android:paddingHorizontal">@dimen/_14sdp</item>
+    <item name="android:paddingVertical">@dimen/_5sdp</item>
+    </style>
+
+
+
 
 
 </resources>

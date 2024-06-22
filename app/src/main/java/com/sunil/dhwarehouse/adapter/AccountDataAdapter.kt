@@ -3,11 +3,10 @@ package com.sunil.dhwarehouse.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Recycler
 import com.sunil.dhwarehouse.RoomDB.AccountMaster
 import com.sunil.dhwarehouse.databinding.AccountItemRowBinding
 
-class AccountDataAdapter(private val userList: MutableList<AccountMaster>) :
+class AccountDataAdapter(private val masterMutableList: MutableList<AccountMaster>) :
     RecyclerView.Adapter<AccountDataAdapter.MyAccountHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAccountHolder {
@@ -17,10 +16,10 @@ class AccountDataAdapter(private val userList: MutableList<AccountMaster>) :
         return MyAccountHolder(binding)
     }
 
-    override fun getItemCount(): Int = userList.size
+    override fun getItemCount(): Int = masterMutableList.size
 
     override fun onBindViewHolder(holder: MyAccountHolder, position: Int) {
-        holder.bind(userList[position])
+        holder.bind(masterMutableList[position])
     }
 
     class MyAccountHolder(private val binding: AccountItemRowBinding) :
