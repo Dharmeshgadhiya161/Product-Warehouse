@@ -74,7 +74,6 @@ class LoginUserActivity : AppCompatActivity() {
 
                 sharedPrefManager.getUserName =
                     binding.filledTextField.editText?.getText().toString()
-                sharedPrefManager.getFirstShow = true
 
                 if (!sharedPrefManager.isExcelFileShowing) {
                     showAddExcelFileDialog(dialog)
@@ -187,6 +186,7 @@ class LoginUserActivity : AppCompatActivity() {
                         if (dialog.isShowing) {
                             dialog.dismiss()
                             sharedPrefManager.isExcelFileShowing = true
+                            sharedPrefManager.getFirstShow = true
 
                             startActivity(Intent(this@LoginUserActivity, MainActivity::class.java))
                             finish()
