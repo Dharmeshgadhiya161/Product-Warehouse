@@ -34,7 +34,7 @@
             android:name=".Activity.LoginUserActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.AccountMasterActivity"
+            android:name=".Activity.ItemProductActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

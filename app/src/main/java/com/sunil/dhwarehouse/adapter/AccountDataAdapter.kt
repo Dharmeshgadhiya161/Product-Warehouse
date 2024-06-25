@@ -1,15 +1,24 @@
 package com.sunil.dhwarehouse.adapter
 
-import android.graphics.Color
+import android.app.Activity
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.sunil.dhwarehouse.Activity.ItemProductActivity
+import com.sunil.dhwarehouse.R
 import com.sunil.dhwarehouse.RoomDB.AccountMaster
 import com.sunil.dhwarehouse.databinding.AccountItemRowBinding
 
-class AccountDataAdapter(private var masterMutableList: MutableList<AccountMaster>,private var query: String = "") :
+class AccountDataAdapter(
+    var context: Activity,
+    private var masterMutableList: MutableList<AccountMaster>,
+    private var query: String = ""
+) :
     RecyclerView.Adapter<AccountDataAdapter.MyAccountHolder>() {
     //private var filteredDataList: MutableList<AccountMaster> = masterMutableList.toMutableList()
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAccountHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding: AccountItemRowBinding =
@@ -18,21 +27,38 @@ class AccountDataAdapter(private var masterMutableList: MutableList<AccountMaste
     }
 
     override fun getItemCount(): Int = masterMutableList.size
-    fun updateData(newAccounts: MutableList<AccountMaster>,query: String) {
+    fun updateData(newAccounts: MutableList<AccountMaster>, query: String) {
         masterMutableList = newAccounts
         this.query = query
         notifyDataSetChanged()
     }
+
     override fun onBindViewHolder(holder: MyAccountHolder, position: Int) {
-        holder.bind(masterMutableList[position],query)
+        holder.bind(masterMutableList[position], query, context)
     }
 
     class MyAccountHolder(private val binding: AccountItemRowBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(accountMaster: AccountMaster,query1: String) {
-            binding.txtAccountName.setHighlightText(accountMaster.account_name, query1, Color.BLUE) // Change the highlight color
-            binding.txtAccountAddress.text=accountMaster.addess
-            binding.txtAccountPhone.setHighlightText(accountMaster.mobile_no,query1,Color.GREEN)
+        fun bind(accountMaster: AccountMaster, query1: String, context: Activity) {
+            binding.txtAccountName.setHighlightText(
+                accountMaster.account_name,
+                query1,
+                context.getColor(R.color.colorPrimary)
+            ) // Change the highlight color
+            binding.txtAccountAddress.text = accountMaster.addess
+            binding.txtAccountPhone.setHighlightText(
+                accountMaster.mobile_no,
+                query1,
+                context.getColor(R.color.colorPrimary)
+            )
+
+            binding.cardV.setOnClickListener {
+                val intent = Intent(context, ItemProductActivity::class.java)
+                intent.putExtra("MedicalName", accountMaster.account_name)
+                intent.putExtra("MedicalAddress", accountMaster.addess)
+                context.startActivity(intent)
+            }
+
         }
     }
 

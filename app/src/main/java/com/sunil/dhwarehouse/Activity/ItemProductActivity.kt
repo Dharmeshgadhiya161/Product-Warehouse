@@ -1,6 +1,5 @@
 package com.sunil.dhwarehouse.Activity
 
-import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
@@ -9,41 +8,48 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.AccountMaster
+import com.sunil.dhwarehouse.RoomDB.ItemMaster
 import com.sunil.dhwarehouse.RoomDB.MasterDatabase
-import com.sunil.dhwarehouse.databinding.ActivityAccountMasterBinding
+import com.sunil.dhwarehouse.databinding.ActivityItemProductBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AccountMasterActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityAccountMasterBinding
-    private lateinit var aryAccount1: MutableList<AccountMaster>
-    private var tag = "AccountMasterActivity"
+class ItemProductActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityItemProductBinding
+    private lateinit var itemMasterList: MutableList<ItemMaster>
+    private var tag = "ItemProductActivity"
+    private var medicalName = String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        binding = ActivityAccountMasterBinding.inflate(layoutInflater)
+        binding = ActivityItemProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        aryAccount1 = ArrayList()
+        val medicalName = intent.getStringExtra("MedicalName")
+        Log.d("SecondActivity", "Received MedicalName: $medicalName")
+
+        binding.txtMedicalName.text = medicalName
+
+        itemMasterList = ArrayList()
 
         lifecycleScope.launch(Dispatchers.IO) {
 
-            val accountDao = MasterDatabase.getDatabase(this@AccountMasterActivity).accountDao()
+            val accountDao = MasterDatabase.getDatabase(this@ItemProductActivity).itemDao()
 
-            aryAccount1 = accountDao.getAccountMaster()
+            itemMasterList = accountDao.getItemMaster().toMutableList()
 
             withContext(Dispatchers.Main) {
-                for (item in aryAccount1) {
-                    Log.e(tag, "onCreate: ${item.account_name}")
+                for (item in itemMasterList) {
+                    Log.e(tag, "onCreate: ${item.item_name}")
                 }
-                Log.e(tag, "onCreate: ${aryAccount1.size}")
+                Log.e(tag, "onCreate: ${itemMasterList.size}")
 
             }
         }

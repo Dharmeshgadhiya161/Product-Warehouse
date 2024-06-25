@@ -5,9 +5,12 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.Window
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -27,11 +30,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sharedPrefManager: SharedPrefManager
     private lateinit var aryAccount1: MutableList<AccountMaster>
+    private lateinit var dayWiseAryAccount1: MutableList<AccountMaster>
     lateinit var aryNewListAccount: MutableList<AccountMaster>
     private lateinit var showingDialog: ShowingDialog
     private lateinit var accountDataAdapter: AccountDataAdapter
 
-    lateinit var dayName: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -45,96 +48,160 @@ class MainActivity : AppCompatActivity() {
         }
         sharedPrefManager = SharedPrefManager(this@MainActivity)
         aryAccount1 = ArrayList()
+        dayWiseAryAccount1 = ArrayList()
         aryNewListAccount = ArrayList()
-        setProgressShowDialog(this, "Load Data..!")
-        setDataLoad()
+        //setProgressShowDialog(this, "Load Data..!")
+        setDataLoad("All")
+        setTabSelect()
 
-//        binding.txtMon.setOnClickListener {
-//
-//            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
-//            binding.txtMon.background = getDrawable(R.drawable.bg_select_rectangle)
-//            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
-//            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
-//            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
-//            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
-//            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
-//            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
-//
-//
-//            lifecycleScope.launch(Dispatchers.IO) {
-//                val accountDao = MasterDatabase.getDatabase(this@MainActivity).accountDao()
-//                aryAccount1 = accountDao.getAccountMaster()
-//                withContext(Dispatchers.Main) {
-//                    for (item in aryAccount1) {
-//                        if (item.day == "MONDAY") {
-//                            aryAccount1.add(item)
-//                            accountDataAdapter.updateData(aryAccount1)
-//                        }
-//                    }
-//
-//                    Log.e("Main", "onCreate: ${aryAccount1.size}")
-//                    Log.e("Main", "onCreate: ${aryAccount1.size}")
-//                }
-//            }
-//        }
-
-
-       binding.searchView.setOnQueryTextListener { query ->
+        binding.searchView.setOnQueryTextListener { query ->
             filterAccounts(query)
         }
-
-
-//        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String?): Boolean {
-//                Log.d("MainActivity", "Query text submit: $query")
-//                query?.let { accountDataAdapter.filter(it) } // Assuming your adapter has a filter method
-//                return false
-//            }
-//
-//            override fun onQueryTextChange(newText: String?): Boolean {
-//                Log.d("MainActivity", "Query text change: $newText")
-//                newText?.let { accountDataAdapter.filter(it) } // Assuming your adapter has a filter method
-//                return false
-//            }
-//        })
-
     }
+
+    private fun setTabSelect() {
+        binding.txtAll.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+
+            setDataLoad("All")
+        }
+
+        binding.txtMon.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+
+            setDataLoad("MONDAY")
+        }
+
+        binding.txtSun.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.white))
+
+            setDataLoad("SUNDAY")
+        }
+    }
+
     private lateinit var filteredList: MutableList<AccountMaster>
     private fun filterAccounts(query: String) {
-        filteredList = aryAccount1.filter {
-            it.account_name.contains(query, ignoreCase = true)|| it.mobile_no.contains(query, ignoreCase = true)
+        filteredList = dayWiseAryAccount1.filter {
+            it.account_name.contains(query, ignoreCase = true) || it.mobile_no.contains(
+                query, ignoreCase = true
+            )
         }.toMutableList()
-
-        accountDataAdapter.updateData(filteredList,query)
+        accountDataAdapter.updateData(filteredList, query)
     }
-    private fun setDataLoad() {
+
+    private fun setDataLoad(dayName: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val accountDao = MasterDatabase.getDatabase(this@MainActivity).accountDao()
             aryAccount1 = accountDao.getAccountMaster()
-            binding.rvAllAccount.layoutManager = LinearLayoutManager(this@MainActivity)
+
+//            lifecycleScope.launch(Dispatchers.IO) {
+//                Thread.sleep(200)
+//                runOnUiThread {
+//                    showDialog()
+//                }
+//            }
+
+
+            if (dayName == "All") {
+                dayWiseAryAccount1.clear()
+                for (item in aryAccount1) {
+                    dayWiseAryAccount1.add(item)
+                }
+            } else {
+                dayWiseAryAccount1.clear()
+                for (item in aryAccount1) {
+                    if (item.day == dayName) {
+                        dayWiseAryAccount1.add(item)
+                    }
+                }
+            }
+
             withContext(Dispatchers.Main) {
-                accountDataAdapter = AccountDataAdapter(aryAccount1)
-                binding.rvAllAccount.adapter = accountDataAdapter
+                if (dayWiseAryAccount1.size != 0) {
+//                    lifecycleScope.launch(Dispatchers.IO) {
+//                        Thread.sleep(300)
+//
+//                        runOnUiThread {
+//                            dismissDialog()
+//                        }
+//                    }
+                    binding.rvAllAccount.visibility = View.VISIBLE
+                    binding.layoutNoData.constNoDataLay.visibility = View.GONE
+                    accountDataAdapter = AccountDataAdapter(this@MainActivity,dayWiseAryAccount1)
+                    binding.rvAllAccount.layoutManager = LinearLayoutManager(this@MainActivity)
+                    binding.rvAllAccount.adapter = accountDataAdapter
+                } else {
+                    binding.rvAllAccount.visibility = View.GONE
+                    binding.layoutNoData.constNoDataLay.visibility = View.VISIBLE
+                }
             }
         }
     }
 
-    fun setProgressShowDialog(context: Activity, string: String) {
-        showingDialog = ShowingDialog(context, string)
-        showingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+    private fun setProgressShowDialog(context: Activity, msg: String) {
+        showingDialog = ShowingDialog(context, msg)
         showingDialog.setCanceledOnTouchOutside(false)
         showingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
-    fun showDialog(context: Activity) {
-        if (!context.isFinishing) {
-            showingDialog.show()
-        }
+    private fun showDialog() {
+        //showingDialog.show()
     }
 
-    fun dismissDialog(context: Activity) {
-        if (!context.isFinishing && showingDialog.isShowing) {
-            showingDialog.cancel()
-        }
+    private fun dismissDialog() {
+//        if (showingDialog.isShowing) {
+//            showingDialog.cancel()
+//        }
     }
 }
