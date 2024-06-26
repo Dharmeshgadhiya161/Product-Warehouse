@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         aryAccount1 = ArrayList()
         dayWiseAryAccount1 = ArrayList()
         aryNewListAccount = ArrayList()
-        //setProgressShowDialog(this, "Load Data..!")
         setDataLoad("All")
         setTabSelect()
 
@@ -144,14 +143,6 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val accountDao = MasterDatabase.getDatabase(this@MainActivity).accountDao()
             aryAccount1 = accountDao.getAccountMaster()
-
-//            lifecycleScope.launch(Dispatchers.IO) {
-//                Thread.sleep(200)
-//                runOnUiThread {
-//                    showDialog()
-//                }
-//            }
-
 
             if (dayName == "All") {
                 dayWiseAryAccount1.clear()

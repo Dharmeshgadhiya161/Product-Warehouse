@@ -18,11 +18,9 @@ class AccountDataAdapter(
     RecyclerView.Adapter<AccountDataAdapter.MyAccountHolder>() {
     //private var filteredDataList: MutableList<AccountMaster> = masterMutableList.toMutableList()
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAccountHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
         val binding: AccountItemRowBinding =
-            AccountItemRowBinding.inflate(layoutInflater, parent, false)
+            AccountItemRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyAccountHolder(binding)
     }
 
