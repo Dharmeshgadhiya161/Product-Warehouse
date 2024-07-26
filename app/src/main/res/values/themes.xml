@@ -26,7 +26,10 @@
     </style>
 
 
-
+    <style name="rounded" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">30dp</item>
+    </style>
 
 
 </resources>

@@ -1,12 +1,15 @@
 package com.sunil.dhwarehouse
 
 import android.app.Activity
+import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -31,10 +34,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPrefManager: SharedPrefManager
     private lateinit var aryAccount1: MutableList<AccountMaster>
     private lateinit var dayWiseAryAccount1: MutableList<AccountMaster>
-    lateinit var aryNewListAccount: MutableList<AccountMaster>
+    private lateinit var aryNewListAccount: MutableList<AccountMaster>
     private lateinit var showingDialog: ShowingDialog
     private lateinit var accountDataAdapter: AccountDataAdapter
-
+    private lateinit var filteredListMain: MutableList<AccountMaster>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -50,8 +53,12 @@ class MainActivity : AppCompatActivity() {
         aryAccount1 = ArrayList()
         dayWiseAryAccount1 = ArrayList()
         aryNewListAccount = ArrayList()
+        filteredListMain = ArrayList()
         setDataLoad("All")
         setTabSelect()
+
+        binding.txtUsername.text = sharedPrefManager.getUserName
+
 
         binding.searchView.setOnQueryTextListener { query ->
             filterAccounts(query)
@@ -105,6 +112,123 @@ class MainActivity : AppCompatActivity() {
             setDataLoad("MONDAY")
         }
 
+
+        binding.txtTue.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+
+            setDataLoad("TUESDAY")
+        }
+
+        binding.txtWed.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+
+            setDataLoad("WEDNESDAY")
+        }
+
+        binding.txtThu.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+
+            setDataLoad("TUESDAY")
+        }
+
+        binding.txtFri.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+
+            setDataLoad("FRIDAY")
+        }
+
+        binding.txtSat.setOnClickListener {
+
+            binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtMon.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtTue.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtWed.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtThu.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtFri.background = getDrawable(R.drawable.bg_un_select_rectangle)
+            binding.txtSat.background = getDrawable(R.drawable.bg_select_rectangle)
+            binding.txtSun.background = getDrawable(R.drawable.bg_un_select_rectangle)
+
+            binding.txtAll.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtMon.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtTue.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtWed.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtThu.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtFri.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+            binding.txtSat.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.txtSun.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
+
+            setDataLoad("SATURDAY")
+        }
+
+
         binding.txtSun.setOnClickListener {
 
             binding.txtAll.background = getDrawable(R.drawable.bg_un_select_rectangle)
@@ -129,14 +253,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var filteredList: MutableList<AccountMaster>
+
     private fun filterAccounts(query: String) {
-        filteredList = dayWiseAryAccount1.filter {
+        filteredListMain = dayWiseAryAccount1.filter {
             it.account_name.contains(query, ignoreCase = true) || it.mobile_no.contains(
                 query, ignoreCase = true
             )
         }.toMutableList()
-        accountDataAdapter.updateData(filteredList, query)
+        accountDataAdapter.updateData(filteredListMain, query)
     }
 
     private fun setDataLoad(dayName: String) {
@@ -169,7 +293,7 @@ class MainActivity : AppCompatActivity() {
 //                    }
                     binding.rvAllAccount.visibility = View.VISIBLE
                     binding.layoutNoData.constNoDataLay.visibility = View.GONE
-                    accountDataAdapter = AccountDataAdapter(this@MainActivity,dayWiseAryAccount1)
+                    accountDataAdapter = AccountDataAdapter(this@MainActivity, dayWiseAryAccount1)
                     binding.rvAllAccount.layoutManager = LinearLayoutManager(this@MainActivity)
                     binding.rvAllAccount.adapter = accountDataAdapter
                 } else {
@@ -194,5 +318,26 @@ class MainActivity : AppCompatActivity() {
 //        if (showingDialog.isShowing) {
 //            showingDialog.cancel()
 //        }
+    }
+
+    private fun showAddExcelFileDialog(dialog: Dialog) {
+
+        dialog.setContentView(R.layout.dialog_change_excel)
+        dialog.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
+        dialog.show()
+
+        dialog.findViewById<TextView>(R.id.btnNo).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.findViewById<TextView>(R.id.btnYes).setOnClickListener {
+            dialog.dismiss()
+        }
+
     }
 }

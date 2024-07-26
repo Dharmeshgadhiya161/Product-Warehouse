@@ -1,8 +1,10 @@
 package com.sunil.dhwarehouse.Activity
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -10,18 +12,17 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.AccountMaster
 import com.sunil.dhwarehouse.RoomDB.ClickItemCategory
-import com.sunil.dhwarehouse.RoomDB.ItemCategoryName
 import com.sunil.dhwarehouse.RoomDB.ItemMaster
 import com.sunil.dhwarehouse.RoomDB.MasterDatabase
-import com.sunil.dhwarehouse.adapter.AccountDataAdapter
 import com.sunil.dhwarehouse.adapter.ItemCategoryAdapter
 import com.sunil.dhwarehouse.adapter.ItemProductAdapter
 import com.sunil.dhwarehouse.databinding.ActivityItemProductBinding
+import com.sunil.dhwarehouse.model.MyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 
 class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private lateinit var binding: ActivityItemProductBinding
@@ -34,8 +35,8 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private var TAG = "ItemProductActivity"
     private var medicalName = ""
     private var itemCategoryName = ""
-
-
+    private var all = "ALL"
+    private lateinit var viewModel: MyViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -46,9 +47,11 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        medicalName = intent.getStringExtra("MedicalName").toString()
-        Log.d(TAG, "Received MedicalName: $medicalName")
 
+        medicalName = intent.getStringExtra("MedicalName").toString()
+        //Log.d(TAG, "Received MedicalName: $medicalName")
+
+        Log.e(TAG, "onCreate: ")
         binding.txtMedicalName.text = medicalName
 
         itemMasterList = ArrayList()
@@ -62,52 +65,63 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
             itemMasterList = accountDao.getItemMaster().toMutableList()
 
             /*--------this Code first Time use default 0 position get--------------*/
-            itemCategoryName = itemMasterList[0].category
+            itemCategoryName = all
+            //  itemCategoryName = itemMasterList[0].category
             println("itemCategoryName at position 0:--> $itemCategoryName")/*-------------End Code--------------------------------*/
-            for (item in itemMasterList) {
-                itemCategoryList1.add(item.category)
-            }
-            for (item in itemCategoryList1) {
-                if (item !in uniqueList) {
-                    uniqueList.add(item)
-                }
-            }
-            // Remove only the last blank string from the list
-            if (uniqueList.last().isBlank()) {
-                uniqueList.removeAt(uniqueList.lastIndex)
-            }
 
-            println("List after removing duplicates: ${uniqueList.size}")
 
             withContext(Dispatchers.Main) {
-                itemCategoryAdapter = ItemCategoryAdapter(
-                    this@ItemProductActivity, uniqueList, this@ItemProductActivity
-                )
+
+                for (item in itemMasterList) {
+                    itemCategoryList1.add(all)
+                    itemCategoryList1.add(item.category)
+                }
+                for (item in itemCategoryList1) {
+                    //TODO item in same Name item category remove list
+                    if (item !in uniqueList) {
+                        uniqueList.add(item)
+                    }
+                }
+                // Remove only the last blank string from the list
+                if (uniqueList.last().isBlank()) {
+                    uniqueList.removeAt(uniqueList.lastIndex)
+                }
+
+                println("List after removing duplicates: ${uniqueList.size}")
+
+
                 binding.rvItemCategory.layoutManager = LinearLayoutManager(
                     this@ItemProductActivity, LinearLayoutManager.HORIZONTAL, false
                 )
+                itemCategoryAdapter = ItemCategoryAdapter(
+                    this@ItemProductActivity,
+                    uniqueList,
+                    this@ItemProductActivity
+                )
+
                 binding.rvItemCategory.adapter = itemCategoryAdapter
 
                 /*----------ProductWiseDataShow-------------------------------------------*/
 
-                for (item in itemMasterList) {
-                    if (item.category == itemCategoryName) {
-                        productWiseItemList.add(item)
-                        println("itemCategoryName:--> ${productWiseItemList.size}")
-                    }
-                }
+                //  for (item in itemMasterList) {
+                //  if (itemCategoryName == all) {
+                productWiseItemList.addAll(itemMasterList)
+                println("itemCategoryNameSize:--> ${productWiseItemList.size}")
+                //}
+                //}
 
                 itemProductAdapter =
-                    ItemProductAdapter(this@ItemProductActivity, productWiseItemList)
+                    ItemProductAdapter(this@ItemProductActivity, productWiseItemList,"",accountDao,binding.btnRequestOrder,binding.rvItemProduct)
                 binding.rvItemProduct.layoutManager = LinearLayoutManager(this@ItemProductActivity)
                 binding.rvItemProduct.adapter = itemProductAdapter
-
+              //  setupKeyboardListener()
             }
         }
 
         binding.searchView.setOnQueryTextListener { query ->
             filterAccounts(query)
         }
+
     }
 
     private lateinit var filteredList: MutableList<ItemMaster>
@@ -124,13 +138,17 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
         Log.e(TAG, "onClickItemCat:--> $categorySelect")
         productWiseItemList.clear()
         for (item in itemMasterList) {
-            if (item.category == categorySelect) {
+            if (categorySelect == all) {
+                productWiseItemList.add(item)
+                println("onClickItemCat:--> ${productWiseItemList.size}")
+            } else if (item.category == categorySelect) {
                 productWiseItemList.add(item)
                 println("onClickItemCat:--> ${productWiseItemList.size}")
             }
         }
         itemProductAdapter.updateData(productWiseItemList, "")
-
     }
+
+
 }
 

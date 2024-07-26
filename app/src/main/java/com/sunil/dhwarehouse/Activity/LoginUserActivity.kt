@@ -8,6 +8,8 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -23,11 +25,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.sunil.dhwarehouse.MainActivity
 import com.sunil.dhwarehouse.R
 import com.sunil.dhwarehouse.RoomDB.AccountMaster
 import com.sunil.dhwarehouse.RoomDB.ItemMaster
 import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.common.DialogUtil
+import com.sunil.dhwarehouse.common.NetworkUtil
 import com.sunil.dhwarehouse.common.SharedPrefManager
 import com.sunil.dhwarehouse.common.ShowingDialog
 import com.sunil.dhwarehouse.databinding.ActivityLoginUserBinding
@@ -38,6 +44,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
 
 class LoginUserActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginUserBinding
@@ -48,6 +55,9 @@ class LoginUserActivity : AppCompatActivity() {
     private lateinit var aryAccount1: MutableList<AccountMaster>
     lateinit var dialog: Dialog
     lateinit var showingDialog: ShowingDialog
+    private lateinit var storageReference: StorageReference
+    private lateinit var deleteLocalFile: File
+    var TAG = "LoginUserActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginUserBinding.inflate(layoutInflater)
@@ -58,7 +68,7 @@ class LoginUserActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
+        storageReference = FirebaseStorage.getInstance().reference
         sharedPrefManager = SharedPrefManager(this@LoginUserActivity)
         aryAccount1 = ArrayList()
         dialog = Dialog(this)
@@ -76,7 +86,17 @@ class LoginUserActivity : AppCompatActivity() {
                     binding.filledTextField.editText?.getText().toString()
 
                 if (!sharedPrefManager.isExcelFileShowing) {
-                    showAddExcelFileDialog(dialog)
+
+                    if (checkPermission()) {
+                        if (NetworkUtil.isInternetAvailable(this)) {
+                            downloadAccountMasterFile()
+                        } else {
+                            DialogUtil.showNoInternetDialog(this)
+                        }
+                    } else {
+                        requestPermission()
+                    }
+                    //showAddExcelFileDialog(dialog)
                 }
             }
         }
@@ -106,7 +126,12 @@ class LoginUserActivity : AppCompatActivity() {
         if (requestCode == storage_permission_code) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Permission granted, proceed with file selection
-                openFilePicker()
+                //  openFilePicker()
+                if (NetworkUtil.isInternetAvailable(this)) {
+                    downloadAccountMasterFile()
+                } else {
+                    DialogUtil.showNoInternetDialog(this)
+                }
             } else {
                 // Permission denied
                 Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
@@ -114,93 +139,78 @@ class LoginUserActivity : AppCompatActivity() {
         }
     }
 
-    private fun openFilePicker() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            this.addCategory(Intent.CATEGORY_OPENABLE)
-            this.type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        }
-        startActivityForResult(intent, fileRequestCode)
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun downloadAccountMasterFile() {
+        val fileReference = storageReference.child("account master.xlsx")
+        val localFile = getLocalFilePath("account_master.xlsx")
+        deleteLocalFile = localFile
+        Log.d(TAG, "Starting download from: ${fileReference.path}")
 
-        Log.d("Excel Data", "Come Result")
-        if (requestCode == fileRequestCode && resultCode == Activity.RESULT_OK) {
-            Log.d("Excel Data", "Come Result ok")
-            data?.data?.also { uri ->
-                Log.d("Excel Data", "Start")
-                showDialog(this)
-                CoroutineScope(Dispatchers.IO).launch {
+        fileReference.getFile(localFile).addOnSuccessListener {
+            Log.d(TAG, "File downloaded successfully: ${localFile.absolutePath}")
+            showDialog(this)
+            // Check if the file is not empty
+            if (localFile.length() == 0L) {
+                Log.e(TAG, "Downloaded file is empty.")
+                return@addOnSuccessListener
+            }
+            val uri = Uri.fromFile(localFile)
 
-                    if (fileType == 1) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val data = readExcelAccountMasterFile(uri)
+                Log.e(TAG, "reading Excel file{${data.size}}")
+                if (data.size != 0) {
 
-                        val data = readExcelAccountMasterFile(uri)
-                        if (data.size != 0) {
+                    val accountDao =
+                        MasterDatabase.getDatabase(this@LoginUserActivity).accountDao()
 
-                            val accountDao =
-                                MasterDatabase.getDatabase(this@LoginUserActivity).accountDao()
+                    accountDao.deleteAllAccounts()
+                    data.forEach { row ->
+                        accountDao.insert(row)
+                    }
+                    aryAccount1 = accountDao.getAccountMaster()
+                    Log.d(TAG, "Account Master come to add : " + data.size)
+                    Log.d(
+                        TAG, "Account Master come to add aryAccount1 : " + aryAccount1.size
+                    )
+                    sharedPrefManager.isAccountExcelRead = true
+                    dismissDialog(this@LoginUserActivity)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        Thread.sleep(200)
+                        downloadItemMasterFile()
+                    }
+                    // Delete the file after reading
+                    //  deleteLocalFile(loca3lFile, "account_master.xlsx")
+                } else {
+                    Log.e("Master RoomDB", "UserName not mach")
 
-                            accountDao.deleteAllAccounts()
-                            data.forEach { row ->
-                                accountDao.insert(row)
-                            }
-                            aryAccount1 = accountDao.getAccountMaster()
-                            Log.d("Master RoomDB", "Account Master come to add : " + data.size)
-                            Log.d(
-                                "Master RoomDB aryAccount1",
-                                "Account Master come to add aryAccount1 : " + aryAccount1.size
-                            )
-                            sharedPrefManager.isAccountExcelRead = true
-                            dismissDialog(this@LoginUserActivity)
-                        } else {
-                            Log.e("Master RoomDB", "UserName not mach")
+                    if (dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                    sharedPrefManager.isAccountExcelRead = false
+                    sharedPrefManager.isExcelFileShowing = false
+                    sharedPrefManager.getFirstShow = false
+                    dismissDialog(this@LoginUserActivity)
 
-                            if (dialog.isShowing) {
-                                dialog.dismiss()
-                            }
-                            sharedPrefManager.isAccountExcelRead = false
-                            sharedPrefManager.isExcelFileShowing = false
-                            sharedPrefManager.getFirstShow = false
-                            dismissDialog(this@LoginUserActivity)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        Thread.sleep(500)
 
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                Thread.sleep(500)
-
-                                runOnUiThread {
-                                    binding.filledTextField.error =
-                                        "Username cannot be match please try again.!"
-                                }
-                            }
+                        runOnUiThread {
+                            binding.filledTextField.error =
+                                "Username cannot be match please try again.!"
                         }
-                    } else {
-                        var itemDao = MasterDatabase.getDatabase(this@LoginUserActivity).itemDao()
-                        val data = readExcelItemMasterFile(uri)
-                        Log.d("Master RoomDB", "Item Master come to add : " + data.size)
-                        itemDao.deleteAllItems()
-                        data.forEach { row ->
-                            itemDao.insert(row)
-                        }
-                        sharedPrefManager.isItemExcelRead = true
-
-                        if (dialog.isShowing) {
-                            dialog.dismiss()
-                            sharedPrefManager.isExcelFileShowing = true
-                            sharedPrefManager.getFirstShow = true
-
-                            startActivity(Intent(this@LoginUserActivity, MainActivity::class.java))
-                            finish()
-                        }
-                        Log.d("Master RoomDB", "Item Master data added.")
-
-                        dismissDialog(this@LoginUserActivity)
                     }
                 }
             }
+
+        }.addOnFailureListener { exception ->
+            Log.e(TAG, "Error downloading file", exception)
+            Toast.makeText(this, "Does not have permission downloading file", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
-    suspend fun readExcelAccountMasterFile(uri: Uri): ArrayList<AccountMaster> {
+    private suspend fun readExcelAccountMasterFile(uri: Uri): ArrayList<AccountMaster> {
         return withContext(Dispatchers.IO) {
             Log.d("Excel Data", "Account Master Start1")
 
@@ -222,13 +232,10 @@ class LoginUserActivity : AppCompatActivity() {
                 if (isFirst) {
                     isFirst = false
                 } else {
-
                     var index: Int = 0
                     while (cellIterator.hasNext()) {
                         val cell = cellIterator.next()
-
                         if (cell.cellType != CellType.BLANK && cell.cellType != CellType.FORMULA) {
-
                             if (index == 0)
                                 accountMaster.sales_man = cell.stringCellValue
                             else if (index == 1) {
@@ -250,24 +257,6 @@ class LoginUserActivity : AppCompatActivity() {
 
                             index++
                         }
-
-                        /*when (cell.cellType) {
-                            CellType.STRING -> {
-                                Log.d("Excel Data", "String : ${cell.stringCellValue}")
-                            }
-                            CellType.NUMERIC -> {
-                                Log.d("Excel Data", "Numeric : ${cell.numericCellValue}")
-                            }
-                            CellType._NONE -> TODO()
-                            CellType.FORMULA -> Log.d("Excel Data", "FORMULA : ${cell.cellFormula}")
-                            CellType.BLANK -> TODO()
-                            CellType.BOOLEAN -> Log.d(
-                                "Excel Data",
-                                "BOOLEAN : ${cell.booleanCellValue}"
-                            )
-                            CellType.ERROR -> Log.d("Excel Data", "ERROR : ${cell.errorCellValue}")
-                        }*/
-
                     }
 
                     if (sharedPrefManager.getUserName == accountMaster.sales_man) {
@@ -283,9 +272,57 @@ class LoginUserActivity : AppCompatActivity() {
         }
     }
 
-    suspend fun readExcelItemMasterFile(uri: Uri): ArrayList<ItemMaster> {
+
+    private fun downloadItemMasterFile() {
+        val fileReference = storageReference.child("stock leger  margine.xlsx")
+        val localFile = getLocalFilePath("stock_leger_margine.xlsx")
+        deleteLocalFile = localFile
+        Log.d(TAG, "Starting download from: ${fileReference.path}")
+
+        fileReference.getFile(localFile).addOnSuccessListener {
+            Log.d(TAG, "File downloaded successfully: ${localFile.absolutePath}")
+            showDialog(this)
+            // Check if the file is not empty
+            if (localFile.length() == 0L) {
+                Log.e(TAG, "Downloaded file is empty.")
+                return@addOnSuccessListener
+            }
+            val uri = Uri.fromFile(localFile)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                var itemDao = MasterDatabase.getDatabase(this@LoginUserActivity).itemDao()
+                val data = readExcelItemMasterFile(uri)
+                Log.d(TAG, "Item Master come to add : " + data.size)
+                itemDao.deleteAllItems()
+                data.forEach { row ->
+                    itemDao.insert(row)
+                }
+                dismissDialog(this@LoginUserActivity)
+                sharedPrefManager.isItemExcelRead = true
+                sharedPrefManager.isExcelFileShowing = true
+                sharedPrefManager.getFirstShow = true
+
+                deleteLocalFile(localFile,"stock_leger_margine.xlsx")
+
+                startActivity(Intent(this@LoginUserActivity, MainActivity::class.java))
+                overridePendingTransition(R.anim.enter_animation, R.anim.exit_animation)
+
+                finish()
+
+                Log.d(TAG, "Item Master data added.")
+
+
+            }
+
+        }.addOnFailureListener { exception ->
+            Log.e(TAG, "Error downloading file", exception)
+        }
+    }
+
+
+    private suspend fun readExcelItemMasterFile(uri: Uri): ArrayList<ItemMaster> {
         return withContext(Dispatchers.IO) {
-            Log.d("Excel Data", "Item Master Start1")
+            Log.d(TAG, "Item Master Start1")
 
             var aryItems: ArrayList<ItemMaster> = ArrayList<ItemMaster>()
 
@@ -329,32 +366,22 @@ class LoginUserActivity : AppCompatActivity() {
                             else if (index == 6)
                                 itemMaster.sale_rate = cell.numericCellValue
                             else if (index == 7)
-                                itemMaster.stock_qty = cell.numericCellValue
+                                itemMaster.margin = cell.numericCellValue
                             else if (index == 8)
+                                itemMaster.stock_qty = cell.numericCellValue
+                            else if (index == 9)
                                 itemMaster.stock_amount = cell.numericCellValue
-//                            else if (index == 9)
-//                                itemMaster.dump_day = cell.numericCellValue
+                            else if (index == 10)
+                                itemMaster.edtxt_qty = cell.numericCellValue
+                            else if (index == 11)
+                                itemMaster.edtxt_free = cell.numericCellValue
+                            else if (index == 12)
+                                itemMaster.edtxt_scm = cell.numericCellValue
+                            else if (index == 13)
+                                itemMaster.txt_subTotal = cell.numericCellValue
 
                             index++
                         }
-
-                        /*when (cell.cellType) {
-                            CellType.STRING -> {
-                                Log.d("Excel Data", "String : ${cell.stringCellValue}")
-                            }
-                            CellType.NUMERIC -> {
-                                Log.d("Excel Data", "Numeric : ${cell.numericCellValue}")
-                            }
-                            CellType._NONE -> TODO()
-                            CellType.FORMULA -> Log.d("Excel Data", "FORMULA : ${cell.cellFormula}")
-                            CellType.BLANK -> TODO()
-                            CellType.BOOLEAN -> Log.d(
-                                "Excel Data",
-                                "BOOLEAN : ${cell.booleanCellValue}"
-                            )
-                            CellType.ERROR -> Log.d("Excel Data", "ERROR : ${cell.errorCellValue}")
-                        }*/
-
                     }
                     aryItems.add(itemMaster)
                 }
@@ -381,7 +408,11 @@ class LoginUserActivity : AppCompatActivity() {
         dialog.findViewById<TextView>(R.id.btnAccountExcel).setOnClickListener {
             fileType = 1
             if (checkPermission()) {
-                openFilePicker()
+                if (NetworkUtil.isInternetAvailable(this)) {
+                    downloadAccountMasterFile()
+                } else {
+                    DialogUtil.showNoInternetDialog(this)
+                }
             } else {
                 requestPermission()
             }
@@ -389,7 +420,7 @@ class LoginUserActivity : AppCompatActivity() {
         dialog.findViewById<TextView>(R.id.btnItemExcel).setOnClickListener {
             fileType = 2
             if (checkPermission()) {
-                openFilePicker()
+                downloadItemMasterFile()
             } else {
                 requestPermission()
             }
@@ -397,20 +428,19 @@ class LoginUserActivity : AppCompatActivity() {
 
     }
 
-    fun setProgressShowDialog(context: Activity, string: String) {
+    private fun setProgressShowDialog(context: Activity, string: String) {
         showingDialog = ShowingDialog(context, string)
-        //showingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         showingDialog.setCanceledOnTouchOutside(false)
         showingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
-    fun showDialog(context: Activity) {
+    private fun showDialog(context: Activity) {
         if (!context.isFinishing) {
             showingDialog.show()
         }
     }
 
-    fun dismissDialog(context: Activity) {
+    private fun dismissDialog(context: Activity) {
         if (!context.isFinishing && showingDialog.isShowing) {
             showingDialog.cancel()
         }
@@ -420,4 +450,121 @@ class LoginUserActivity : AppCompatActivity() {
         super.onDestroy()
         dismissDialog(this)
     }
+
+
+    private fun getLocalFilePath(fileName: String): File {
+        // Get the directory for the app's private files
+        val directory = File(filesDir, "my_excel_files")//folderName
+        if (!directory.exists()) {
+            directory.mkdirs() // Create the directory if it does not exist
+        }
+        return File(directory, fileName)
+    }
+
+
+    private fun deleteLocalFile(file: File, expectedFileName: String) {
+        if (file.exists()) {
+            if (file.name == expectedFileName) {
+                if (file.delete()) {
+                    Log.d(TAG, "File deleted successfully: ${file.absolutePath}")
+                } else {
+                    Log.e(TAG, "Failed to delete file: ${file.absolutePath}")
+                }
+            } else {
+                Log.e(
+                    TAG,
+                    "File name does not match expected file name: ${file.name} vs $expectedFileName"
+                )
+            }
+        } else {
+            Log.e(TAG, "File does not exist: ${file.absolutePath}")
+        }
+    }
+
+
+    //    private fun openFilePicker() {
+//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+//            this.addCategory(Intent.CATEGORY_OPENABLE)
+//            this.type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+//        }
+//        startActivityForResult(intent, fileRequestCode)
+//    }
+//
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//
+//        Log.d("Excel Data", "Come Result")
+//        if (requestCode == fileRequestCode && resultCode == Activity.RESULT_OK) {
+//            Log.d("Excel Data", "Come Result ok")
+//            data?.data?.also { uri ->
+//                Log.d("Excel Data", "Start")
+//                showDialog(this)
+//                CoroutineScope(Dispatchers.IO).launch {
+//
+//                    if (fileType == 1) {
+//
+//                        val data = readExcelAccountMasterFile(uri)
+//                        if (data.size != 0) {
+//
+////                            val accountDao =
+////                                MasterDatabase.getDatabase(this@LoginUserActivity).accountDao()
+////
+////                            accountDao.deleteAllAccounts()
+////                            data.forEach { row ->
+////                                accountDao.insert(row)
+////                            }
+////                            aryAccount1 = accountDao.getAccountMaster()
+////                            Log.d("Master RoomDB", "Account Master come to add : " + data.size)
+////                            Log.d(
+////                                "Master RoomDB aryAccount1",
+////                                "Account Master come to add aryAccount1 : " + aryAccount1.size
+////                            )
+////                            sharedPrefManager.isAccountExcelRead = true
+////                            dismissDialog(this@LoginUserActivity)
+//                        } else {
+//                            Log.e("Master RoomDB", "UserName not mach")
+//
+//                            if (dialog.isShowing) {
+//                                dialog.dismiss()
+//                            }
+//                            sharedPrefManager.isAccountExcelRead = false
+//                            sharedPrefManager.isExcelFileShowing = false
+//                            sharedPrefManager.getFirstShow = false
+//                            dismissDialog(this@LoginUserActivity)
+//
+//                            lifecycleScope.launch(Dispatchers.IO) {
+//                                Thread.sleep(500)
+//
+//                                runOnUiThread {
+//                                    binding.filledTextField.error =
+//                                        "Username cannot be match please try again.!"
+//                                }
+//                            }
+//                        }
+//                    } else {
+////                        var itemDao = MasterDatabase.getDatabase(this@LoginUserActivity).itemDao()
+////                        val data = readExcelItemMasterFile(uri)
+////                        Log.d("Master RoomDB", "Item Master come to add : " + data.size)
+////                        itemDao.deleteAllItems()
+////                        data.forEach { row ->
+////                            itemDao.insert(row)
+////                        }
+////                        sharedPrefManager.isItemExcelRead = true
+////
+////                        if (dialog.isShowing) {
+////                            dialog.dismiss()
+////                            sharedPrefManager.isExcelFileShowing = true
+////                            sharedPrefManager.getFirstShow = true
+////
+////                            startActivity(Intent(this@LoginUserActivity, MainActivity::class.java))
+////                            finish()
+////                        }
+////                        Log.d("Master RoomDB", "Item Master data added.")
+////
+////                        dismissDialog(this@LoginUserActivity)
+//                    }
+//                }
+//            }
+//        }
+//    }
 }

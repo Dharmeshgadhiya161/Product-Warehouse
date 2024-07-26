@@ -42,6 +42,9 @@ class SplashActivity : AppCompatActivity() {
                 finish()
             }
 
+//            startActivity(Intent(this@SplashActivity, FirebaseMainActivity::class.java))
+//            finish()
+
         }, 3000)
 
     }

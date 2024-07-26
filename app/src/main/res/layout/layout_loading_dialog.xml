@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="@dimen/_180sdp"
+        android:layout_width="@dimen/_160sdp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginVertical="10dp"
@@ -24,7 +24,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_90sdp"
                 android:layout_centerHorizontal="true"
-                android:layout_marginBottom="@dimen/_10sdp"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
                 app:lottie_rawRes="@raw/loader" />

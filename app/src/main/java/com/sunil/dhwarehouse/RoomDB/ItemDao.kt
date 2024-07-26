@@ -3,6 +3,7 @@ package com.sunil.dhwarehouse.RoomDB
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface ItemDao {
@@ -11,8 +12,12 @@ interface ItemDao {
     suspend fun insert(item: ItemMaster)
 
     @Query("SELECT * FROM item_master")
-    suspend fun getItemMaster() : List<ItemMaster>
+    fun getItemMaster() : List<ItemMaster>
 
     @Query("DELETE FROM item_master")
     suspend fun deleteAllItems()
+
+    @Update
+    suspend fun updateItem(item: ItemMaster)
+
 }

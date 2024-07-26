@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "609906782507",
+    "project_id": "demoexcelfile",
+    "storage_bucket": "demoexcelfile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:609906782507:android:0a33fb5765d7c487e5d56e",
+        "android_client_info": {
+          "package_name": "com.sunil.dhwarehouse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnmzntAa8PDAfN0FpkZxzkahPY0rR5Qms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

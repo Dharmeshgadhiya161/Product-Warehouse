@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginVertical="@dimen/_3sdp">
 
-    <TextView
+    <com.sunil.dhwarehouse.common.HighlightTextView
         android:id="@+id/txtItemProductName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,10 +14,11 @@
         android:singleLine="true"
         android:text="ProductName"
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="15sp"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/iv_clear_Product"
         android:layout_width="@dimen/_14sdp"
         android:layout_height="@dimen/_14sdp"
         android:layout_marginTop="@dimen/_10sdp"
@@ -26,13 +26,14 @@
         android:elevation="@dimen/_25sdp"
         android:padding="2dp"
         android:src="@drawable/baseline_close_24"
+        android:visibility="gone"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/linerBottom"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_50sdp"
+        android:layout_height="@dimen/_45sdp"
         android:layout_marginTop="@dimen/_2sdp"
         android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/txtItemProductName">
@@ -56,24 +57,29 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_col_txt_rectangle"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
+                    android:paddingVertical="@dimen/_2sdp"
                     android:text="Qty"
                     android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
 
                 <EditText
+                    android:id="@+id/edtAddQty"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="2dp"
                     android:background="@android:color/transparent"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
-                    android:inputType="numberDecimal"
-                    android:maxLength="10"
+                    android:inputType="number"
+                    android:maxLength="8"
                     android:maxLines="1"
-                    android:textCursorDrawable="@color/black"
-                    android:textSize="14sp" />
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
 
 
             </LinearLayout>
@@ -81,7 +87,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/_5sdp"
+                android:layout_marginLeft="@dimen/_3sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_light_col_rectangle"
                 android:orientation="vertical">
@@ -89,13 +95,16 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_col_txt_rectangle"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
+                    android:paddingVertical="@dimen/_2sdp"
                     android:text="Free"
                     android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
 
                 <EditText
+                    android:id="@+id/edtAddQtyFree"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="2dp"
@@ -105,14 +114,15 @@
                     android:inputType="numberDecimal"
                     android:maxLength="10"
                     android:maxLines="1"
-                    android:textSize="14sp" />
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/_5sdp"
+                android:layout_marginLeft="@dimen/_3sdp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_light_col_rectangle"
                 android:orientation="vertical">
@@ -120,13 +130,16 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_col_txt_rectangle"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
+                    android:paddingVertical="@dimen/_2sdp"
                     android:text="Scm(%)"
                     android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:textSize="12sp" />
 
                 <EditText
+                    android:id="@+id/edtAddScm"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="2dp"
@@ -137,7 +150,43 @@
                     android:maxLength="10"
                     android:maxLines="1"
                     android:textColor="@color/black"
-                    android:textSize="14sp" />
+                    android:textSize="13sp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="@dimen/_3sdp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_light_col_rectangle"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_light_col_txt_rectangle"
+                    android:fontFamily="@font/roboto_medium"
+                    android:gravity="center"
+                    android:paddingVertical="@dimen/_2sdp"
+                    android:text="Margin"
+                    android:textColor="@color/black"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvMargin"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="2dp"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@font/roboto_medium"
+                    android:gravity="center"
+                    android:inputType="number"
+                    android:maxLength="10"
+                    android:maxLines="1"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
 
 
             </LinearLayout>
@@ -150,52 +199,137 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/_3sdp"
-            android:layout_weight="1.1"
+            android:layout_weight="1.4"
             android:background="@drawable/bg_white_col_rectangle"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingVertical="2dp"
+            android:paddingLeft="@dimen/_4sdp"
+            android:paddingRight="@dimen/_4sdp">
 
 
             <TextView
-                android:id="@+id/txtMRP"
+                android:id="@+id/txtProductMRP"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
+                android:includeFontPadding="false"
+                android:maxLines="1"
                 android:text="111"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="13sp" />
 
-            <TextView
-                android:id="@+id/txtTotal"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/linerTotal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_regular"
-                android:gravity="center"
-                android:text="111"
-                android:textColor="@color/sub_text"
-                android:textSize="14sp" />
+                android:visibility="gone"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/txtTotalQty"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/txtNetSale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="0"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+
+                <TextView
+                    android:id="@+id/txtItemMultiplication"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_3sdp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="*"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/txtCountQty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="@dimen/_3sdp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="0"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text=" = "
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+
+                <TextView
+                    android:id="@+id/txtProductSubTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="0"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_regular"
-                android:gravity="center"
-                android:text="111"
-                android:textColor="@color/sub_text"
-                android:textSize="14sp" />
+                android:orientation="horizontal">
 
+
+
+                <TextView
+                    android:id="@+id/txtTotalQty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="00"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_medium"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:maxLines="1"
+                    android:text="(Qty)"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="@dimen/_6sdp"
-        android:background="@color/sub_text"
-        app:layout_constraintTop_toBottomOf="@id/linerBottom" />
+    <!--    <View-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="1dp"-->
+    <!--        android:layout_marginVertical="@dimen/_6sdp"-->
+    <!--        android:background="@color/sub_text"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/linerBottom" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

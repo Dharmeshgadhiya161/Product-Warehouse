@@ -1,9 +1,16 @@
+//plugins {
+////    alias(libs.plugins.android.application)
+////    alias(libs.plugins.jetbrains.kotlin.android)
+////    alias(libs.plugins.jetbrains.kotlin.kapt)
+//    id 'com.android.application'
+//
+//}
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.jetbrains.kotlin.kapt)
+    id("com.android.application")
+    id ("org.jetbrains.kotlin.android")
+    id ("org.jetbrains.kotlin.kapt")
+    id ("com.google.gms.google-services") // Add this line
 }
-
 android {
     namespace = "com.sunil.dhwarehouse"
     compileSdk = 34
@@ -66,4 +73,11 @@ dependencies {
     implementation ("com.intuit.sdp:sdp-android:1.1.1")
     implementation ("com.airbnb.android:lottie:6.4.1")
 
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    // Add the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-storage")
+//    implementation ("org.apache.poi:poi:5.2.3")
+//    implementation ("org.apache.poi:poi-ooxml:5.2.3")
 }

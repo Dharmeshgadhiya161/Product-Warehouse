@@ -2,17 +2,26 @@
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/bg_search_round"
     android:orientation="horizontal"
     android:padding="8dp">
 
     <ImageView
         android:id="@+id/search_icon"
-        android:layout_width="wrap_content"
+        android:layout_width="22dp"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_search"
+        android:src="@drawable/iv_search_icon"
+        android:padding="@dimen/_2sdp"
         app:tint="@color/sub_text" />
+
+<!--    <ImageView-->
+<!--        android:id="@+id/search_back"-->
+<!--        android:layout_width="22dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:src="@drawable/iv_search_icon"-->
+<!--        android:padding="@dimen/_3sdp"-->
+<!--        app:tint="@color/sub_text" />-->
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/search_edit_text"
@@ -20,19 +29,23 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@android:color/transparent"
-        android:fontFamily="@font/roboto_regular"
+        android:fontFamily="@font/roboto_medium"
         android:hint="Search"
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:paddingStart="8dp"
+        android:textSize="14sp"
         android:textColor="@android:color/black"
         android:textColorHint="@color/sub_text" />
 
     <ImageView
         android:id="@+id/clear_search"
-        android:layout_width="wrap_content"
+        android:layout_width="22dp"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:src="@drawable/baseline_close_24"
         android:visibility="gone"
-        app:tint="@color/colorPrimary" />
+        app:tint="@color/black"
+        android:padding="@dimen/_2sdp"
+        android:layout_gravity="center"
+        />
 </androidx.appcompat.widget.LinearLayoutCompat>

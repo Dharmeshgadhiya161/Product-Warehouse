@@ -38,6 +38,7 @@ class ItemCategoryAdapter(
     override fun onBindViewHolder(holder: MyItemCategoryHolder, position: Int) {
         holder.bind(categoryList[position])
 
+
         if (position == selectedItemPosition) {
             holder.binding.cardClick.setCardBackgroundColor(context.getColor(R.color.colorAccent))
             holder.binding.txtItemCategory.setTextColor(context.getColor(R.color.white))

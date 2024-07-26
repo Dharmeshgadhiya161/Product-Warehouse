@@ -17,8 +17,8 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:layout_width="@dimen/_70sdp"
-            android:layout_height="@dimen/_70sdp"
+            android:layout_width="@dimen/_65sdp"
+            android:layout_height="@dimen/_65sdp"
             android:layout_gravity="center"
             android:layout_marginBottom="@dimen/_10sdp"
             android:src="@drawable/iv_user" />
@@ -49,19 +49,23 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/filledTextField"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="@dimen/_24sdp"
+            android:hint="Enter Username"
+            app:shapeAppearance="@style/rounded"
+            app:endIconMode="clear_text"
             app:cursorColor="@color/black"
-            app:cursorErrorColor="@color/black">
+            app:cursorErrorColor="@color/black"
+            app:startIconDrawable="@drawable/baseline_account_circle_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edt_userName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_medium"
-                android:hint="Enter Username"
                 android:inputType="text"
                 android:maxLength="2"
                 android:textColor="@color/black"

@@ -8,4 +8,6 @@
     <color name="colorAccent">#4157FF</color>
     <color name="colorPrimaryDark">#e0def8</color>
     <color name="bg_main">#F5F5F5</color>
+
+    <color name="color_light">#664157FF</color>
 </resources>

@@ -25,8 +25,8 @@ class AccountDataAdapter(
     }
 
     override fun getItemCount(): Int = masterMutableList.size
-    fun updateData(newAccounts: MutableList<AccountMaster>, query: String) {
-        masterMutableList = newAccounts
+    fun updateData(filteredListMain: MutableList<AccountMaster>, query: String) {
+        masterMutableList = filteredListMain
         this.query = query
         notifyDataSetChanged()
     }
