@@ -22,7 +22,7 @@
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/progressBar"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_90sdp"
+                android:layout_height="@dimen/_70sdp"
                 android:layout_centerHorizontal="true"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"

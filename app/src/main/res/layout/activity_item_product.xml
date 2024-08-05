@@ -84,20 +84,80 @@
         android:layout_height="match_parent" />
 
 
-    <TextView
+    <RelativeLayout
         android:id="@+id/btn_RequestOrder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/_46sdp"
-        android:layout_marginBottom="@dimen/_20sdp"
+        android:layout_marginHorizontal="@dimen/_48sdp"
+        android:layout_marginBottom="@dimen/_18sdp"
         android:background="@drawable/ic_btn_shedow_blue"
-        android:fontFamily="@font/roboto_bold"
-        android:gravity="center"
-        android:paddingBottom="@dimen/_14sdp"
-        android:text="Request Order"
-        android:textColor="@color/white"
-        android:textSize="18sp"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_2sdp">
+
+            <ImageView
+                android:id="@+id/ivCart"
+                android:layout_width="@dimen/_26sdp"
+                android:layout_height="@dimen/_26sdp"
+                android:layout_marginStart="@dimen/_14sdp"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:src="@drawable/iv_cart" />
+
+
+            <TextView
+                android:id="@+id/txtSubtotalRS"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_3sdp"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:layout_toStartOf="@id/btn_Click_RequestOrder"
+                android:layout_toEndOf="@id/ivCart"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="left"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="@dimen/_5sdp"
+                android:singleLine="true"
+                android:text="0"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txtTotalItem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtSubtotalRS"
+                android:layout_marginStart="@dimen/_3sdp"
+                android:layout_toStartOf="@id/btn_Click_RequestOrder"
+                android:layout_toEndOf="@id/ivCart"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="left"
+                android:includeFontPadding="false"
+                android:maxLines="1"
+                android:paddingHorizontal="@dimen/_5sdp"
+                android:text="0 Item"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/btn_Click_RequestOrder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginRight="@dimen/_13sdp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:paddingHorizontal="@dimen/_6sdp"
+                android:text="Review\nOrder"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+        </RelativeLayout>
+
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

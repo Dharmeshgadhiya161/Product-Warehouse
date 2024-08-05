@@ -8,10 +8,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-
-
     <application
-        android:name="com.sunil.dhwarehouse.MyApplication"
+        android:name=".MyApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -22,16 +20,19 @@
         android:theme="@style/Theme.DhWareHouse"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.ReviewOderItemActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.InvoiceBilActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.SplashActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-
         </activity>
         <activity
             android:name=".Activity.LoginUserActivity"
@@ -40,19 +41,15 @@
             android:name=".Activity.ItemProductActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustPan|stateVisible"
-            />
+            android:windowSoftInputMode="adjustPan|stateVisible" />
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:theme="@style/ThemeMainActivity.DhWareHouse">
-        </activity>
-
+            android:theme="@style/ThemeMainActivity.DhWareHouse" />
         <activity
             android:name=".Activity.FirebaseMainActivity"
             android:exported="false"
-            android:theme="@style/ThemeMainActivity.DhWareHouse">
-        </activity>
+            android:theme="@style/ThemeMainActivity.DhWareHouse" />
     </application>
 
 </manifest>

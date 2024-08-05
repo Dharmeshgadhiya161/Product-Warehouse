@@ -1,25 +1,28 @@
 package com.sunil.dhwarehouse.Activity
 
-import android.graphics.Rect
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.sunil.dhwarehouse.R
 import com.sunil.dhwarehouse.RoomDB.ClickItemCategory
+import com.sunil.dhwarehouse.RoomDB.ItemDao
 import com.sunil.dhwarehouse.RoomDB.ItemMaster
 import com.sunil.dhwarehouse.RoomDB.MasterDatabase
 import com.sunil.dhwarehouse.adapter.ItemCategoryAdapter
-import com.sunil.dhwarehouse.adapter.ItemProductAdapter
+import com.sunil.dhwarehouse.common.MyAdapter
+import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityItemProductBinding
-import com.sunil.dhwarehouse.model.MyViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -31,12 +34,17 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private lateinit var itemCategoryList1: MutableList<String>
     private lateinit var uniqueList: MutableList<String>
     private lateinit var itemCategoryAdapter: ItemCategoryAdapter
-    private lateinit var itemProductAdapter: ItemProductAdapter
+
+    //    private lateinit var itemProductAdapter: ItemProductAdapter
+    private lateinit var itemProductAdapter: MyAdapter
     private var TAG = "ItemProductActivity"
     private var medicalName = ""
     private var itemCategoryName = ""
     private var all = "ALL"
-    private lateinit var viewModel: MyViewModel
+    private lateinit var bottomSheetDialog: BottomSheetDialog
+    private lateinit var accountDao: ItemDao
+    private lateinit var selectItemList: MutableList<ItemMaster>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -49,25 +57,25 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
         }
 
         medicalName = intent.getStringExtra("MedicalName").toString()
-        //Log.d(TAG, "Received MedicalName: $medicalName")
-
-        Log.e(TAG, "onCreate: ")
         binding.txtMedicalName.text = medicalName
 
         itemMasterList = ArrayList()
         productWiseItemList = ArrayList()
         itemCategoryList1 = ArrayList()
         uniqueList = ArrayList()
-
+        selectItemList = ArrayList()
+        bottomSheetDialog = BottomSheetDialog(this@ItemProductActivity)
         lifecycleScope.launch(Dispatchers.IO) {
 
-            val accountDao = MasterDatabase.getDatabase(this@ItemProductActivity).itemDao()
+            accountDao = MasterDatabase.getDatabase(this@ItemProductActivity).itemDao()
             itemMasterList = accountDao.getItemMaster().toMutableList()
+
 
             /*--------this Code first Time use default 0 position get--------------*/
             itemCategoryName = all
-            //  itemCategoryName = itemMasterList[0].category
-            println("itemCategoryName at position 0:--> $itemCategoryName")/*-------------End Code--------------------------------*/
+            //itemCategoryName = itemMasterList[0].category
+            println("itemCategoryName at position 0:--> $itemCategoryName")
+            /*-------------End Code--------------------------------*/
 
 
             withContext(Dispatchers.Main) {
@@ -75,6 +83,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                 for (item in itemMasterList) {
                     itemCategoryList1.add(all)
                     itemCategoryList1.add(item.category)
+
                 }
                 for (item in itemCategoryList1) {
                     //TODO item in same Name item category remove list
@@ -89,7 +98,6 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
 
                 println("List after removing duplicates: ${uniqueList.size}")
 
-
                 binding.rvItemCategory.layoutManager = LinearLayoutManager(
                     this@ItemProductActivity, LinearLayoutManager.HORIZONTAL, false
                 )
@@ -103,23 +111,36 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
 
                 /*----------ProductWiseDataShow-------------------------------------------*/
 
-                //  for (item in itemMasterList) {
-                //  if (itemCategoryName == all) {
                 productWiseItemList.addAll(itemMasterList)
-                println("itemCategoryNameSize:--> ${productWiseItemList.size}")
-                //}
-                //}
 
                 itemProductAdapter =
-                    ItemProductAdapter(this@ItemProductActivity, productWiseItemList,"",accountDao,binding.btnRequestOrder,binding.rvItemProduct)
+                    MyAdapter(
+                        this@ItemProductActivity,
+                        productWiseItemList,
+                        "",
+                        accountDao,
+                        binding.btnRequestOrder,
+                        binding.rvItemProduct,
+                        binding.txtSubtotalRS, binding.txtTotalItem, binding.btnClickRequestOrder,
+                        itemMasterList
+                    )
                 binding.rvItemProduct.layoutManager = LinearLayoutManager(this@ItemProductActivity)
                 binding.rvItemProduct.adapter = itemProductAdapter
-              //  setupKeyboardListener()
+
             }
         }
 
         binding.searchView.setOnQueryTextListener { query ->
             filterAccounts(query)
+        }
+
+        binding.btnClickRequestOrder.setOnClickListener {
+            //showBottomSheetDialog(itemMasterList, accountDao)
+            val intent = Intent(this@ItemProductActivity, ReviewOderItemActivity::class.java)
+//            intent.putExtra("MedicalName", putExtraaccountMaster.account_name)
+//            intent.putExtra("MedicalAddress", accountMaster.addess)
+            startActivity(intent)
+
         }
 
     }
@@ -135,18 +156,62 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     }
 
     override fun onClickItemCat(categorySelect: String) {
-        Log.e(TAG, "onClickItemCat:--> $categorySelect")
+        //  Log.e(TAG, "onClickItemCat:--> $categorySelect")
         productWiseItemList.clear()
         for (item in itemMasterList) {
             if (categorySelect == all) {
                 productWiseItemList.add(item)
-                println("onClickItemCat:--> ${productWiseItemList.size}")
             } else if (item.category == categorySelect) {
                 productWiseItemList.add(item)
-                println("onClickItemCat:--> ${productWiseItemList.size}")
+                println("categorySelect: ${productWiseItemList.size}")
             }
         }
         itemProductAdapter.updateData(productWiseItemList, "")
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if (bottomSheetDialog.isShowing) {
+            bottomSheetDialog.dismiss()
+        }
+
+        if (itemMasterList.size > 0) {
+            for (item in itemMasterList) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    item.edtxt_qty = 0.0
+                    item.edtxt_free = 0.0
+                    item.edtxt_scm = 0.0
+                    item.txt_net_rate = 0.0
+                    item.txt_subTotal = 0.0
+                    item.margin = item.old_margin
+                    accountDao.updateItem(item)
+                }
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (UtilsFile.isChangeValues) {
+            // Refresh the RecyclerView data
+            lifecycleScope.launch(Dispatchers.IO) {
+                productWiseItemList.clear()
+                accountDao = MasterDatabase.getDatabase(this@ItemProductActivity).itemDao()
+                itemMasterList = ArrayList()
+                itemMasterList = accountDao.getItemMaster().toMutableList()
+
+                productWiseItemList.addAll(itemMasterList)
+                withContext(Dispatchers.Main) {
+                    itemProductAdapter.updateData(productWiseItemList, "")
+                    itemProductAdapter.updateTotalData(itemMasterList)
+                    UtilsFile.isChangeValues = false
+
+                }
+
+            }
+        }
+
     }
 
 

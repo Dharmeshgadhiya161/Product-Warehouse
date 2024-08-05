@@ -12,6 +12,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 abstract class MasterDatabase : RoomDatabase(){
     abstract fun accountDao() : AccountDao
     abstract fun itemDao() : ItemDao
+   // abstract fun invoiceDao():InvoiceDao
     companion object{
 
         @Volatile

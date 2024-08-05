@@ -10,6 +10,8 @@ plugins {
     id ("org.jetbrains.kotlin.android")
     id ("org.jetbrains.kotlin.kapt")
     id ("com.google.gms.google-services") // Add this line
+    // Add the dependency for the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
 }
 android {
     namespace = "com.sunil.dhwarehouse"
@@ -55,6 +57,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.databinding.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -78,6 +81,8 @@ dependencies {
     // Add the dependency for the Cloud Storage library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-storage")
-//    implementation ("org.apache.poi:poi:5.2.3")
-//    implementation ("org.apache.poi:poi-ooxml:5.2.3")
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
 }

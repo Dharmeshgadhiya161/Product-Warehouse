@@ -33,7 +33,9 @@ class ItemProductAdapter(
     var freeQty = 0.0
     var scmPercent = 0.0
     private lateinit var selectItemList: MutableList<ItemMaster>
-
+    init {
+        setHasStableIds(true)
+    }
     class MyItemProductHolder(var binding: ItemProductRowBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(itemMaster: ItemMaster, query1: String, context: Activity) {
@@ -51,19 +53,27 @@ class ItemProductAdapter(
 
     override fun getItemCount(): Int = itemMasterList.size
 
+    override fun getItemViewType(position: Int): Int {
+        return super.getItemViewType(position)
+    }
+
+    // Override getItemId to return the unique ID of each item
+    override fun getItemId(position: Int): Long {
+        return itemMasterList[position].id.toLong()
+    }
     override fun onBindViewHolder(holder: MyItemProductHolder, position: Int) {
+
         holder.bind(itemMasterList[position], query, context)
         val itemMaster: ItemMaster = itemMasterList[position]
+
 
         holder.binding.txtProductMRP.text =
             "${context.getString(R.string.rs)}" + itemMaster.mrp.toString()
         holder.binding.txtTotalQty.text = itemMaster.stock_qty.toString()
-        holder.binding.tvMargin.text = String.format("%.1f", itemMaster.margin)
-
+        holder.binding.edtMargin.setText(String.format("%.1f", itemMaster.margin))
 
         holder.binding.edtAddQty.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) {
-                // Scroll to the position of the focused EditText
                 recyclerView.post {
                     recyclerView.smoothScrollToPosition(position)
                 }
@@ -163,8 +173,8 @@ class ItemProductAdapter(
 
 
         btnRequestOrder.setOnClickListener {
-
-
+            Log.e(TAG, "onBindViewHolder:--> ${itemMaster.edtxt_qty}")
+            Log.e(TAG, "onBindViewHolder SubTotal:--> ${itemMaster.txt_subTotal}")
         }
 
 
@@ -175,7 +185,7 @@ class ItemProductAdapter(
         holder.binding.edtAddScm.addTextChangedListener(twAddScm)
         holder.binding.edtAddScm.tag = twAddScm
 
-        Log.e(TAG, "onBindViewHolder:--> $position  ${itemMaster.id} ${itemMaster.item_name}${itemMaster.edtxt_qty}${itemMaster.txt_subTotal}")
+        Log.e(TAG, "onBindViewHolder:--> $position  ${itemMaster.id} ${itemMaster.item_name} , ${itemMaster.edtxt_qty}   ${itemMaster.txt_subTotal}")
 
         holder.binding.ivClearProduct.setOnClickListener {
             holder.binding.txtTotalQty.text = itemMaster.stock_qty.toString()

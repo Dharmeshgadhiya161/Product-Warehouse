@@ -16,7 +16,7 @@ class AccountDataAdapter(
     private var query: String = ""
 ) :
     RecyclerView.Adapter<AccountDataAdapter.MyAccountHolder>() {
-    //private var filteredDataList: MutableList<AccountMaster> = masterMutableList.toMutableList()
+    private var filteredDataList: MutableList<AccountMaster> = masterMutableList.toMutableList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyAccountHolder {
         val binding: AccountItemRowBinding =

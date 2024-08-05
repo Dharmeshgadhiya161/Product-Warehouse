@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:id="@+id/linerHeader"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="@dimen/_8sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="?actionBarSize">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:padding="@dimen/_2sdp"
+            android:visibility="visible"
+            android:src="@drawable/back_arrow_circular_button" />
+
+        <TextView
+            android:id="@+id/txt_Username"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/_3sdp"
+            android:layout_toRightOf="@id/ivBack"
+            android:layout_toLeftOf="@id/ivExcelFile"
+            android:fontFamily="@font/roboto_medium"
+            android:gravity="center"
+            android:text="Order Review"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/ivExcelFile"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:padding="@dimen/_3sdp"
+            android:visibility="invisible"
+            android:src="@drawable/iv_excel_file" />
+
+    </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvReviewOrderAccount"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linerHeader"
+
+        />
+
+
+    <include
+        android:id="@+id/layoutNoData"
+        layout="@layout/layout_no_data_found"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <TextView
+        android:id="@+id/btn_Click_RequestOrder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:fontFamily="@font/roboto_bold"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:paddingHorizontal="@dimen/_6sdp"
+        android:text="Request Order"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        android:background="@drawable/bg_select_rectangle"
+        android:padding="@dimen/_14sdp"
+        android:layout_marginBottom="@dimen/_15sdp"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -15,19 +15,3 @@ object DialogUtil {
         }
     }
 }
-/*holder.binding.edtAddQty.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                // Update the data source when EditText value changes
-                if (position != RecyclerView.NO_POSITION) {
-                    edtQtyNumber = (s.toString().toDoubleOrNull() ?: 0.0).toString()
-                    //itemMasterList[position].stock_qty = - itemMasterList[position].stock_qty - edtQtyNumber.toDouble()
-                    holder.binding.txtCountQty.text = edtQtyNumber
-                 //   notifyItemChanged(position) // Notify change to refresh the view
-                }
-
-
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })*/

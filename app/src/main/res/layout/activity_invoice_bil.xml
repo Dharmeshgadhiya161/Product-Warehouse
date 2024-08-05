@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".Activity.InvoiceBilActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/linerHeader"
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="@dimen/_8sdp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="?actionBarSize">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:padding="@dimen/_2sdp"
+            android:visibility="visible"
+            android:src="@drawable/back_arrow_circular_button" />
+
+        <TextView
+            android:id="@+id/txt_Username"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/_3sdp"
+            android:layout_toRightOf="@id/ivBack"
+            android:layout_toLeftOf="@id/ivExcelFile"
+            android:fontFamily="@font/roboto_medium"
+            android:gravity="center"
+            android:text="INVOICE"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <ImageView
+            android:id="@+id/ivExcelFile"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:padding="@dimen/_3sdp"
+
+            android:visibility="invisible"
+            android:src="@drawable/iv_excel_file" />
+
+    </RelativeLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvInvoice"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/_8sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        app:layout_constraintTop_toBottomOf="@id/linerHeader" />
+
+    <include
+        android:id="@+id/layoutNoData"
+        layout="@layout/layout_no_data_found"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

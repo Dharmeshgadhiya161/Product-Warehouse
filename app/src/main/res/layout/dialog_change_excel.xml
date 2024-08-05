@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginHorizontal="@dimen/_25sdp"
+        android:layout_marginHorizontal="@dimen/_30sdp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="12dp"
         app:cardElevation="4dp">
@@ -24,10 +24,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_15sdp"
                 android:fontFamily="@font/roboto_bold"
                 android:gravity="center"
-                android:text="Change Excel File"
+                android:text="Update Excel File!"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -35,39 +35,38 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginHorizontal="@dimen/_15sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:layout_marginBottom="@dimen/_20sdp"
-                android:orientation="horizontal">
+                android:layout_marginHorizontal="@dimen/_24sdp"
+                android:layout_marginTop="@dimen/_12sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:orientation="vertical">
 
 
                 <TextView
-                    android:id="@+id/btnNo"
+                    android:id="@+id/btnAccountExcel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginTop="@dimen/_5sdp"
                     android:background="@drawable/ic_btn_shedow_blue"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
                     android:paddingBottom="@dimen/_14sdp"
-                    android:text="No"
+                    android:text="Update Account Excel"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/btnYes"
+                    android:id="@+id/btnItemExcel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginTop="@dimen/_3sdp"
                     android:background="@drawable/ic_btn_shedow_blue"
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
+                    android:visibility="visible"
                     android:paddingBottom="@dimen/_14sdp"
                     android:includeFontPadding="false"
-                    android:text="yes"
+                    android:text="Update Item Excel"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
