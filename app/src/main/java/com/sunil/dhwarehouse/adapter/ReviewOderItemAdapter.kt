@@ -1,9 +1,7 @@
-package com.sunil.dhwarehouse
+package com.sunil.dhwarehouse.adapter
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -11,27 +9,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.sunil.dhwarehouse.Activity.ReviewOderItemActivity
+import com.sunil.dhwarehouse.Activity.InvoiceViewActivity
 import com.sunil.dhwarehouse.R
+import com.sunil.dhwarehouse.RoomDB.InvoiceDao
+import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
 import com.sunil.dhwarehouse.RoomDB.ItemDao
 import com.sunil.dhwarehouse.RoomDB.ItemMaster
+import com.sunil.dhwarehouse.common.ShowingDialog
+import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ReviewOderItemRowBinding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class ReviewOderItemAdapter(
     var context: Activity,
     private var itemMasterList: MutableList<ItemMaster>,
     private var query: String = "",
-    private var accountDao: ItemDao
-    ) : RecyclerView.Adapter<ReviewOderItemAdapter.ViewHolder>() {
+    private var accountDao: ItemDao,
+    private var invoiceDao: InvoiceDao,
+    private var txtSubtotalRS: TextView,
+    private var txtTotalItem: TextView,
+    private var btnClickRequestOrder: TextView,
+    private var getUserName: String,
+    private var medicalName: String,
+    private var medicalAddress: String,
+    private var mobileNo: String,
+    private var showingDialog: ShowingDialog
+) : RecyclerView.Adapter<ReviewOderItemAdapter.ViewHolder>() {
     private var TAG = "ReviewOderItemAdapter"
     var edtQtyNumber = ""
     var subTotalResult = " "
@@ -40,7 +56,8 @@ class ReviewOderItemAdapter(
     var saleRate = 0.0
     var scmRs = 0.0
     var selectItemList: MutableList<ItemMaster> = ArrayList()
-
+    private var totalSubTotal = 0.0
+    private var totalItem = 0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
@@ -56,16 +73,34 @@ class ReviewOderItemAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val itemMaster: ItemMaster = itemMasterList[position]
+        Log.e("ReviewOderItemActivity", "onBindViewHolder:${itemMasterList.size} ")
+        // Set different background colors for odd and even items
+        if (position % 2 == 0) {
+            holder.binding.linerBottom.setBackgroundColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.col_table_line_1
+                )
+            )
+        } else {
+            holder.binding.linerBottom.setBackgroundColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.col_table_line_2
+                )
+            )
+        }
 
-        holder.binding.txtItemProductName.setHighlightText(
-            itemMaster.item_name, query, context.getColor(R.color.colorPrimary)
-        )
+
+        holder.binding.txtItemProductName.text =
+            itemMaster.item_name
+        holder.binding.txtItemProductName.setSelected(true)
+
 
         holder.binding.txtProductMRP.text =
             "${context.getString(R.string.rs)}" + itemMaster.mrp.toString()
 
         holder.binding.txtTotalQty.text = itemMaster.stock_qty.toString()
-
 
         holder.myCustomEditTextListener.updatePosition(
             holder.adapterPosition, holder.binding, itemMaster
@@ -74,6 +109,7 @@ class ReviewOderItemAdapter(
         holder.freeQtyEditTextListener.updatePosition(
             holder.adapterPosition, holder.binding, itemMaster
         )
+
         holder.scmRsEditTextListener.updatePosition(
             holder.adapterPosition, holder.binding, itemMaster
         )
@@ -117,7 +153,6 @@ class ReviewOderItemAdapter(
                 holder.binding.edtAddScm.setText("")
             }
 
-
             selectItemListData()
 
             holder.binding.edtAddQtyFree.enabled()
@@ -141,7 +176,7 @@ class ReviewOderItemAdapter(
 
 
         holder.binding.txtProductSubTotal.text =
-            itemMasterList[holder.adapterPosition].txt_subTotal.toString()
+            "${context.getString(R.string.rs)}" + itemMasterList[holder.adapterPosition].txt_subTotal.toString()
 
 
         holder.binding.ivClearProduct.setOnClickListener {
@@ -164,12 +199,6 @@ class ReviewOderItemAdapter(
 
             /*========================================================================*/
 
-            selectItemList.remove(itemMasterList[holder.adapterPosition])
-
-            for (item in selectItemList) {
-                Log.e(TAG, "selectItemList* remove * --> onBindViewHolder:${item} ")
-            }
-
             holder.binding.edtAddQty.text.clear()
             holder.binding.edtAddQtyFree.text.clear()
             holder.binding.edtAddScm.text.clear()
@@ -181,15 +210,74 @@ class ReviewOderItemAdapter(
             holder.binding.edtAddQtyFree.enabled()
             holder.binding.edtAddScm.enabled()
 
+        }
+
+        btnClickRequestOrder.setOnClickListener {
+            showingDialog.show()
+            // Example usage
+            val (date, time) = UtilsFile().getFormattedDateTime("dd-MM-yyyy", "hh:mm a")
+            println("Date: $date")
+            println("Time: $time")
+            var invoice: InvoiceMaster
+            // Use a list to batch insert invoices if needed
+            val invoicesToInsert = mutableListOf<InvoiceMaster>()
+            for (item in selectItemList) {
+//                edtQtyNumber = holder.binding.txtTotalQty.text.toString()
+//                GlobalScope.launch(Dispatchers.IO) {
+//                    accountDao.updateItem(item = itemMaster.copy(stock_qty = edtQtyNumber.toDouble()))
+//                }
+
+                invoice = InvoiceMaster(
+                    salesName = getUserName,
+                    account_name = medicalName,
+                    address = medicalAddress,
+                    mobile_no = mobileNo,
+                    date = date,
+                    time = time,
+                    productItemName = item.item_name,
+                    qty = item.edtxt_qty,
+                    free = item.edtxt_free,
+                    scm = item.edtxt_scm,
+                    rate = item.txt_net_rate,
+                    subTotal = item.txt_subTotal
+                )
+                invoicesToInsert.add(invoice)
+            }
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    // Batch insert all invoices if supported by your DAO
+                    invoiceDao.insertAll(invoicesToInsert)
+                    Log.e(TAG, "Invoices inserted successfully")
+
+                    withContext(Dispatchers.Main) {
+                        val intent = Intent(context, InvoiceViewActivity::class.java)
+                        intent.putExtra("getUserName", getUserName)
+                        intent.putExtra("MedicalName", medicalName)
+                        intent.putExtra("MedicalAddress", medicalAddress)
+                        intent.putExtra("MobileNo", mobileNo)
+                        intent.putExtra("Date", date)
+                        intent.putExtra("Time", time)
+                        context.startActivity(intent)
+                        if (showingDialog.isShowing) {
+                            showingDialog.dismiss()
+                        }
+                        (context as Activity).finish()
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error inserting invoices: ${e.message}")
+                    withContext(Dispatchers.Main) {
+                        // Dismiss the dialog even if there's an error
+                        if (showingDialog.isShowing) {
+                            showingDialog.dismiss()
+                        }
+                        Toast.makeText(context, "Failed to insert invoices", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            }
 
         }
-//        Log.e(
-//            TAG,
-//            "onBindViewHolder:--> $position  ${itemMaster.id} ${itemMaster.item_name} , ${itemMaster.edtxt_qty}   ${itemMaster.txt_subTotal}" )
-
-
     }
-
 
     override fun getItemCount(): Int {
         return itemMasterList.size
@@ -268,41 +356,38 @@ class ReviewOderItemAdapter(
 
                     updateQtyItem(input)
                     //TODO this code use already scm values edit box add and qty values add this code use
-                }
+                } else if (itemMasterList[position].edtxt_scm > 0.0) {
+                    binding.txtCountQty.text = input
+                    binding.txtTotalQty.text =
+                        (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toString()
 
-//                else if (itemMasterList[position].edtxt_scm > 0.0) {
-//                    binding.txtCountQty.text = input
-//                    binding.txtTotalQty.text =
-//                        (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toString()
-//
-//                    saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
-//                    scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
-//                    netSaleRate = saleRate - scmRs
-//                    itemMasterList[position].txt_net_rate = netSaleRate
-//                    binding.txtNetSale.text = roundValues(netSaleRate).toString()
-//                    subTotalResult = calculateSubTotalRound(
-//                        netSaleRate,
-//                        itemMasterList[position].edtxt_qty
-//                    ).toString()
-//                    binding.txtProductSubTotal.text = subTotalResult
-//
-//                    itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
-//
-//                    binding.edtAddQtyFree.disable()
-//
-//
-//                    GlobalScope.launch(Dispatchers.IO) {
-//                        accountDao.updateItem(item = itemMaster.copy(edtxt_qty = input.toDouble()))
-//                        accountDao.updateItem(item = itemMaster.copy(txt_net_rate = netSaleRate))
-//                        accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
-//                    }
-//
-//                    binding.ivClearProduct.visibility = View.VISIBLE
-//                    binding.linerTotal.visibility = View.VISIBLE
-//                    btnRequestOrder.visibility = View.VISIBLE
-//                }
+                    saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
+                    scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
+                    netSaleRate = saleRate - scmRs
+                    itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
+                    binding.txtNetSale.text =
+                        "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
+                    subTotalResult = calculateSubTotalRound(
+                        netSaleRate,
+                        itemMasterList[position].edtxt_qty
+                    ).toString()
+                    binding.txtProductSubTotal.text =
+                        "${context.getString(R.string.rs)}" + subTotalResult
 
-                else {
+                    itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
+                    binding.edtAddQtyFree.disable()
+
+
+                    GlobalScope.launch(Dispatchers.IO) {
+                        accountDao.updateItem(item = itemMaster.copy(edtxt_qty = input.toDouble()))
+                        accountDao.updateItem(item = itemMaster.copy(txt_net_rate = netSaleRate))
+                        accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
+                    }
+
+                    binding.ivClearProduct.visibility = View.VISIBLE
+                    binding.linerTotal.visibility = View.VISIBLE
+                } else {
                     binding.txtTotalQty.text =
                         (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toString()
                     Log.e(TAG, "onTextChanged Qty NetSaleRate:<Qty>")
@@ -356,14 +441,14 @@ class ReviewOderItemAdapter(
         private fun updateQtyItem(input: String) {
             netSaleRate = calculateNetSaleRate(itemMaster.mrp, itemMaster.margin)
             itemMasterList[position].txt_net_rate = netSaleRate
-            binding.txtNetSale.text = netSaleRate.toString()
+            binding.txtNetSale.text = "${context.getString(R.string.rs)}" + netSaleRate.toString()
             binding.txtCountQty.text = input
 
             subTotalResult = calculateSubTotalRound(
                 netSaleRate,
                 itemMasterList[position].edtxt_qty
             ).toString()
-            binding.txtProductSubTotal.text = subTotalResult
+            binding.txtProductSubTotal.text = "${context.getString(R.string.rs)}" + subTotalResult
             itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
 
 
@@ -377,7 +462,7 @@ class ReviewOderItemAdapter(
 
             binding.ivClearProduct.visibility = View.VISIBLE
             binding.linerTotal.visibility = View.VISIBLE
-           // btnRequestOrder.visibility = View.VISIBLE
+
         }
 
         override fun afterTextChanged(editable: Editable) {
@@ -389,17 +474,13 @@ class ReviewOderItemAdapter(
     private fun selectItemListData() {
         selectItemList = itemMasterList.filter { it.edtxt_qty > 0.0 }
             .toMutableList() as ArrayList<ItemMaster>
-        for (item in selectItemList) {
-            Log.e(TAG, "selectItemList--> $item ")
-        }
-        val totalSubTotal = selectItemList.sumOf { it.txt_subTotal }
-      //  txtSubtotalRS.text =
+//
+        totalSubTotal = selectItemList.sumOf { it.txt_subTotal }
+        txtSubtotalRS.text =
             "${context.getString(R.string.rs)}" + roundValues(totalSubTotal).toString()
-     //   txtTotalItem.text = selectItemList.size.toString() + " Item"
+        totalItem = selectItemList.size
+        txtTotalItem.text = totalItem.toString() + " Items"
 
-//        if (selectItemList.size == 0) {
-//            btnRequestOrder.visibility = View.GONE
-//        }
     }
 
     inner class FreeQtyEditTextListener : TextWatcher {
@@ -495,7 +576,8 @@ class ReviewOderItemAdapter(
                     scmRs = (saleRate * ediScmValue) / 100
                     netSaleRate = saleRate - scmRs
                     itemMasterList[position].txt_net_rate = netSaleRate
-                    binding.txtNetSale.text = roundValues(netSaleRate).toString()
+                    binding.txtNetSale.text =
+                        "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
                     subTotalResult = calculateSubTotalRound(
                         netSaleRate,
                         itemMasterList[position].edtxt_qty
@@ -516,7 +598,8 @@ class ReviewOderItemAdapter(
 
                     /*TODO this is use custom margin add after use this code*/
                     if (itemMasterList[position].edtxt_scm != 0.0
-                        && itemMasterList[position].margin != itemMasterList[position].old_margin) {
+                        && itemMasterList[position].margin != itemMasterList[position].old_margin
+                    ) {
                         netSaleRate = customMarginCalculateResult(
                             itemMasterList[position].mrp,
                             itemMasterList[position].margin,
@@ -525,12 +608,14 @@ class ReviewOderItemAdapter(
 
                         itemMasterList[position].txt_net_rate = netSaleRate
                         Log.e(TAG, "onTextChanged ediMargin NetSaleRate:<ma> $netSaleRate")
-                        binding.txtNetSale.text = roundValues(netSaleRate).toString()
+                        binding.txtNetSale.text =
+                            "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
                         subTotalResult = calculateSubTotalRound(
                             netSaleRate,
                             itemMasterList[position].edtxt_qty
                         ).toString()
-                        binding.txtProductSubTotal.text = subTotalResult
+                        binding.txtProductSubTotal.text =
+                            "${context.getString(R.string.rs)}" + subTotalResult
                         itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
 
                         GlobalScope.launch(Dispatchers.IO) {
@@ -551,14 +636,16 @@ class ReviewOderItemAdapter(
 
                     netSaleRate = calculateNetSaleRate(itemMaster.mrp, itemMaster.margin)
                     itemMasterList[position].txt_net_rate = netSaleRate
-                    binding.txtNetSale.text = netSaleRate.toString()
+                    binding.txtNetSale.text =
+                        "${context.getString(R.string.rs)}" + netSaleRate.toString()
                     binding.txtCountQty.text = itemMasterList[position].edtxt_qty.toString()
 
                     subTotalResult = calculateSubTotalRound(
                         netSaleRate,
                         itemMasterList[position].edtxt_qty
                     ).toString()
-                    binding.txtProductSubTotal.text = subTotalResult
+                    binding.txtProductSubTotal.text =
+                        "${context.getString(R.string.rs)}" + subTotalResult
                     itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
 
                     GlobalScope.launch(Dispatchers.IO) {
@@ -617,12 +704,14 @@ class ReviewOderItemAdapter(
 
                         itemMasterList[position].txt_net_rate = netSaleRate
                         Log.e(TAG, "onTextChanged ediMargin NetSaleRate:<ma> $netSaleRate")
-                        binding.txtNetSale.text = roundValues(netSaleRate).toString()
+                        binding.txtNetSale.text =
+                            "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
                         subTotalResult = calculateSubTotalRound(
                             netSaleRate,
                             itemMasterList[position].edtxt_qty
                         ).toString()
-                        binding.txtProductSubTotal.text = subTotalResult
+                        binding.txtProductSubTotal.text =
+                            "${context.getString(R.string.rs)}" + subTotalResult
                         itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
 
                         GlobalScope.launch(Dispatchers.IO) {
@@ -632,7 +721,10 @@ class ReviewOderItemAdapter(
                         }
 
                         selectItemListData()
+                    } else {
+
                     }
+
                 } else {
                     if (input.isEmpty() || input == "0") {
                         GlobalScope.launch(Dispatchers.IO) {
@@ -676,16 +768,9 @@ class ReviewOderItemAdapter(
     }
 
     fun customMarginCalculateResult(mrp: Double, margin: Double, edtxtScm: Double): BigDecimal {
-//        val result = 16 - ((16 / 1.0) * 20 / 100.0)
 //        val result = (192 - ((192 / 1.1) * 20 / 100))
         val result = mrp - ((mrp / margin) * edtxtScm / 100.0)
         return BigDecimal(result).setScale(2, RoundingMode.HALF_UP) // Round to 2 decimal places
-    }
-
-    fun updateData(filteredList: MutableList<ItemMaster>, query: String) {
-        this.itemMasterList = filteredList
-        this.query = query
-        notifyDataSetChanged()
     }
 
     fun EditText.disable() {

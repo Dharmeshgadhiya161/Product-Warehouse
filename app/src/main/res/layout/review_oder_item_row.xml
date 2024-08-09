@@ -2,50 +2,98 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginVertical="@dimen/_3sdp">
+    android:layout_height="wrap_content">
 
-    <com.sunil.dhwarehouse.common.HighlightTextView
-        android:id="@+id/txtItemProductName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_medium"
-        android:maxLines="1"
-        android:singleLine="true"
-        android:text="ProductName"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/iv_clear_Product"
-        android:layout_width="@dimen/_14sdp"
-        android:layout_height="@dimen/_14sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:background="@drawable/ic_cat_item"
-        android:elevation="@dimen/_25sdp"
-        android:padding="2dp"
-        android:src="@drawable/baseline_close_24"
-        android:visibility="gone"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/linerBottom"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_45sdp"
-        android:layout_marginTop="@dimen/_2sdp"
+        android:layout_height="wrap_content"
+        android:background="@color/col_table_line_1"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/txtItemProductName">
+        app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/txtItemProductName"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="2.2"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:paddingLeft="@dimen/_2sdp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textAlignment="textStart" />
 
+        <EditText
+            android:id="@+id/edtAddQty"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:maxLength="6"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/edtAddQtyFree"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:maxLength="6"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/edtAddScm"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:maxLength="8"
+            android:layout_weight="0.8"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/edtMargin"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/txtNetSale"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/txtProductSubTotal"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textAlignment="center" />
+
+        <ImageView
+            android:id="@+id/iv_clear_Product"
+            android:layout_width="@dimen/_14sdp"
+            android:layout_height="@dimen/_14sdp"
+            android:layout_gravity="center"
+            android:elevation="@dimen/_25sdp"
+            android:padding="1dp"
+            android:src="@drawable/baseline_close_24"
+            android:visibility="visible"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/colorAccent" />
+
+        <!--not use code========================-->
         <LinearLayout
             android:id="@+id/linerBottom1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginRight="2dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -65,21 +113,21 @@
                     android:textColor="@color/black"
                     android:textSize="12sp" />
 
-                <EditText
-                    android:id="@+id/edtAddQty"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="2dp"
-                    android:background="@android:color/transparent"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:inputType="number"
-                    android:maxLength="8"
-                    android:maxLines="1"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                <!--                <EditText-->
+                <!--                    android:id="@+id/edtAddQty"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="match_parent"-->
+                <!--                    android:layout_marginHorizontal="2dp"-->
+                <!--                    android:background="@android:color/transparent"-->
+                <!--                    android:focusable="true"-->
+                <!--                    android:focusableInTouchMode="true"-->
+                <!--                    android:fontFamily="@font/roboto_medium"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:inputType="number"-->
+                <!--                    android:maxLength="8"-->
+                <!--                    android:maxLines="1"-->
+                <!--                    android:textColor="@color/black"-->
+                <!--                    android:textSize="13sp" />-->
 
 
             </LinearLayout>
@@ -103,19 +151,19 @@
                     android:textColor="@color/black"
                     android:textSize="12sp" />
 
-                <EditText
-                    android:id="@+id/edtAddQtyFree"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="2dp"
-                    android:background="@android:color/transparent"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:inputType="numberDecimal"
-                    android:maxLength="8"
-                    android:maxLines="1"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                <!--                <EditText-->
+                <!--                    android:id="@+id/edtAddQtyFree"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="match_parent"-->
+                <!--                    android:layout_marginHorizontal="2dp"-->
+                <!--                    android:background="@android:color/transparent"-->
+                <!--                    android:fontFamily="@font/roboto_medium"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:inputType="numberDecimal"-->
+                <!--                    android:maxLength="8"-->
+                <!--                    android:maxLines="1"-->
+                <!--                    android:textColor="@color/black"-->
+                <!--                    android:textSize="13sp" />-->
 
             </LinearLayout>
 
@@ -138,19 +186,19 @@
                     android:textColor="@color/black"
                     android:textSize="12sp" />
 
-                <EditText
-                    android:id="@+id/edtAddScm"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="2dp"
-                    android:background="@android:color/transparent"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:inputType="numberDecimal"
-                    android:maxLength="8"
-                    android:maxLines="1"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                <!--                <EditText-->
+                <!--                    android:id="@+id/edtAddScm"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="match_parent"-->
+                <!--                    android:layout_marginHorizontal="2dp"-->
+                <!--                    android:background="@android:color/transparent"-->
+                <!--                    android:fontFamily="@font/roboto_medium"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:inputType="numberDecimal"-->
+                <!--                    android:maxLength="8"-->
+                <!--                    android:maxLines="1"-->
+                <!--                    android:textColor="@color/black"-->
+                <!--                    android:textSize="13sp" />-->
 
 
             </LinearLayout>
@@ -174,25 +222,25 @@
                     android:textColor="@color/black"
                     android:textSize="12sp" />
 
-                <EditText
-                    android:id="@+id/edtMargin"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginHorizontal="2dp"
-                    android:background="@android:color/transparent"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:inputType="numberDecimal"
-                    android:maxLength="8"
-                    android:maxLines="1"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                <!--                <EditText-->
+                <!--                    android:id="@+id/edtMargin"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="match_parent"-->
+                <!--                    android:layout_marginHorizontal="2dp"-->
+                <!--                    android:background="@android:color/transparent"-->
+                <!--                    android:fontFamily="@font/roboto_medium"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:inputType="numberDecimal"-->
+                <!--                    android:maxLength="8"-->
+                <!--                    android:maxLines="1"-->
+                <!--                    android:textColor="@color/black"-->
+                <!--                    android:textSize="13sp" />-->
 
 
             </LinearLayout>
 
         </LinearLayout>
-
+        <!--=======================================-->
 
         <LinearLayout
             android:id="@+id/linerBottom2"
@@ -205,7 +253,8 @@
             android:orientation="vertical"
             android:paddingVertical="2dp"
             android:paddingLeft="@dimen/_4sdp"
-            android:paddingRight="@dimen/_4sdp">
+            android:paddingRight="@dimen/_4sdp"
+            android:visibility="gone">
 
 
             <TextView
@@ -224,19 +273,19 @@
                 android:id="@+id/linerTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-                <TextView
-                    android:id="@+id/txtNetSale"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_regular"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:text="0"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                <!--                <TextView-->
+                <!--                    android:id="@+id/txtNetSale"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:fontFamily="@font/roboto_regular"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:maxLines="1"-->
+                <!--                    android:text="0"-->
+                <!--                    android:textColor="@color/black"-->
+                <!--                    android:textSize="13sp" />-->
 
 
                 <TextView
@@ -275,16 +324,16 @@
                     android:textSize="13sp" />
 
 
-                <TextView
-                    android:id="@+id/txtProductSubTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_regular"
-                    android:gravity="center"
-                    android:maxLines="1"
-                    android:text="0"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                <!--                <TextView-->
+                <!--                    android:id="@+id/txtProductSubTotal"-->
+                <!--                    android:layout_width="wrap_content"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:fontFamily="@font/roboto_regular"-->
+                <!--                    android:gravity="center"-->
+                <!--                    android:maxLines="1"-->
+                <!--                    android:text="0"-->
+                <!--                    android:textColor="@color/black"-->
+                <!--                    android:textSize="13sp" />-->
 
 
             </LinearLayout>
@@ -293,7 +342,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
 
 
                 <TextView
@@ -325,11 +373,10 @@
 
     </LinearLayout>
 
-    <!--    <View-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="1dp"-->
-    <!--        android:layout_marginVertical="@dimen/_6sdp"-->
-    <!--        android:background="@color/sub_text"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/linerBottom" />-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/col_table_line_2"
+        app:layout_constraintTop_toBottomOf="@+id/linerBottom" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

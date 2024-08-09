@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+
+
     <application
         android:name=".MyApplication"
         android:allowBackup="false"
@@ -24,6 +26,12 @@
             android:exported="false" />
         <activity
             android:name=".Activity.InvoiceBilActivity"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activity.InvoiceViewActivity"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".Activity.SplashActivity"
@@ -46,10 +54,17 @@
             android:name=".MainActivity"
             android:exported="false"
             android:theme="@style/ThemeMainActivity.DhWareHouse" />
-        <activity
-            android:name=".Activity.FirebaseMainActivity"
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
-            android:theme="@style/ThemeMainActivity.DhWareHouse" />
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
 
 </manifest>

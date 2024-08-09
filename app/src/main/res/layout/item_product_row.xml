@@ -74,7 +74,7 @@
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
                     android:inputType="number"
-                    android:maxLength="8"
+                    android:maxLength="6"
                     android:maxLines="1"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -112,7 +112,7 @@
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
                     android:inputType="numberDecimal"
-                    android:maxLength="8"
+                    android:maxLength="6"
                     android:maxLines="1"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
@@ -224,7 +224,7 @@
                 android:id="@+id/linerTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
+                android:visibility="gone"
                 android:orientation="horizontal">
 
                 <TextView
@@ -292,21 +292,20 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_1sdp"
                 android:orientation="horizontal">
-
-
 
                 <TextView
                     android:id="@+id/txtTotalQty"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_regular"
+                    android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:text="00"
-                    android:textColor="@color/black"
-                    android:textSize="13sp" />
+                    android:textColor="@color/rad"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -316,6 +315,7 @@
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:text="(Qty)"
+                    android:visibility="gone"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
 
@@ -325,11 +325,5 @@
 
     </LinearLayout>
 
-    <!--    <View-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="1dp"-->
-    <!--        android:layout_marginVertical="@dimen/_6sdp"-->
-    <!--        android:background="@color/sub_text"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/linerBottom" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

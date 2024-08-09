@@ -81,15 +81,15 @@ class LoginUserActivity : AppCompatActivity() {
 
                 if (!sharedPrefManager.isExcelFileShowing) {
 
-                   // if (checkPermission()) {
+                    if (checkPermission()) {
                         if (NetworkUtil.isInternetAvailable(this)) {
                             downloadAccountMasterFile()
                         } else {
                             DialogUtil.showNoInternetDialog(this)
                         }
-                 //   } else {
-                  //      requestPermission()
-                  //  }
+                    } else {
+                        requestPermission()
+                    }
                     //showAddExcelFileDialog(dialog)
                 }
             }

@@ -50,12 +50,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dayWiseAryAccount1: MutableList<AccountMaster>
     private lateinit var aryNewListAccount: MutableList<AccountMaster>
     private lateinit var showingDialog: ShowingDialog
-    lateinit var accountDataAdapter: AccountDataAdapter
+    private lateinit var accountDataAdapter: AccountDataAdapter
     private lateinit var filteredListMain: MutableList<AccountMaster>
     private lateinit var itemMasterList: MutableList<ItemMaster>
-
-    lateinit var dialog: Dialog
+    private lateinit var dialog: Dialog
     private lateinit var storageReference: StorageReference
+    private var getUserName=""
+
 
     var TAG = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +74,7 @@ class MainActivity : AppCompatActivity() {
 
         storageReference = FirebaseStorage.getInstance().reference
         dialog = Dialog(this)
+        getUserName = sharedPrefManager.getUserName.toString()
         setProgressShowDialog(this, "Loading.. Excel File!")
 
         aryAccount1 = ArrayList()
@@ -84,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         itemDataListClear()
         setTabSelect()
 
-        binding.txtUsername.text = sharedPrefManager.getUserName
+        binding.txtUsername.text = getUserName
 
 
         binding.searchView.setOnQueryTextListener { query ->
@@ -195,7 +197,7 @@ class MainActivity : AppCompatActivity() {
                 if (dayWiseAryAccount1.size != 0) {
                     binding.rvAllAccount.visibility = View.VISIBLE
                     binding.layoutNoData.constNoDataLay.visibility = View.GONE
-                    accountDataAdapter = AccountDataAdapter(this@MainActivity, dayWiseAryAccount1)
+                    accountDataAdapter = AccountDataAdapter(this@MainActivity, dayWiseAryAccount1,"",getUserName)
                     binding.rvAllAccount.layoutManager = LinearLayoutManager(this@MainActivity)
                     binding.rvAllAccount.adapter = accountDataAdapter
                     if (showingDialog.isShowing) {
@@ -368,6 +370,15 @@ class MainActivity : AppCompatActivity() {
 
         }.addOnFailureListener { exception ->
             Log.e(TAG, "Error downloading file", exception)
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if(UtilsFile.isFinishInvoice){
+            finishAffinity()
+        }else{
+            finishAffinity()
         }
     }
 }

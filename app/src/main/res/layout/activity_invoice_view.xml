@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".Activity.InvoiceViewActivity">
 
     <RelativeLayout
         android:id="@+id/linerHeader"
@@ -28,27 +29,27 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/_3sdp"
-            android:layout_toLeftOf="@id/ivExcelFile"
+            android:layout_toLeftOf="@id/ivFileDownload"
             android:layout_toRightOf="@id/ivBack"
             android:fontFamily="@font/roboto_medium"
             android:gravity="center"
             android:text="Order Review"
             android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
 
         <ImageView
-            android:id="@+id/ivExcelFile"
+            android:id="@+id/ivFileDownload"
             android:layout_width="@dimen/_26sdp"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:padding="@dimen/_3sdp"
             android:src="@drawable/iv_excel_file"
-            android:visibility="invisible" />
+            android:visibility="visible" />
 
     </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/liner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,37 +58,58 @@
         app:layout_constraintTop_toBottomOf="@id/linerHeader">
 
         <TextView
-            android:id="@+id/txt_medicalName"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:id="@+id/txt_dateTime1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_medium"
-            android:gravity="left"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:text="Invoice Date:"
+            android:layout_toLeftOf="@id/txt_medicalAddress"
+            android:textColor="@color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/txt_date_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_regular"
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
             android:text="Order Review"
+            android:layout_below="@+id/txt_dateTime1"
+            android:layout_toLeftOf="@id/txt_medicalAddress"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txt_medicalAddress"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_regular"
-            android:gravity="left"
+            android:gravity="right"
             android:text="Order Review"
+            android:singleLine="true"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:layout_alignParentRight="true"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/txt_medicalPhone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_regular"
-            android:gravity="left"
+            android:gravity="right"
             android:text="Order Review"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:layout_below="@id/txt_medicalAddress"
+            android:layout_alignParentRight="true"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <TableLayout
         android:id="@+id/table_heading_layout"
@@ -172,29 +194,17 @@
                 android:gravity="center"
                 android:text="SubTotal"
                 android:textAlignment="center" />
-
-            <ImageView
-                android:id="@+id/iv_clear_Product"
-                android:layout_width="@dimen/_14sdp"
-                android:layout_height="@dimen/_14sdp"
-                android:layout_marginTop="@dimen/_1sdp"
-                android:elevation="@dimen/_25sdp"
-                android:padding="2dp"
-                android:src="@drawable/baseline_close_24"
-                android:visibility="invisible"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
         </TableRow>
     </TableLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvReviewOrderAccount"
+        android:id="@+id/rvInvoice"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/_4sdp"
         android:layout_marginEnd="@dimen/_4sdp"
-        app:layout_constraintBottom_toTopOf="@id/btn_RequestOrder"
+        app:layout_constraintBottom_toTopOf="@id/vw1"
         app:layout_constraintTop_toBottomOf="@id/table_heading_layout"
         tools:listitem="@layout/review_oder_item_row" />
 
@@ -202,77 +212,43 @@
         android:id="@+id/layoutNoData"
         layout="@layout/layout_no_data_found"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
-    <RelativeLayout
-        android:id="@+id/btn_RequestOrder"
+    <View
+        android:id="@+id/vw1"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginHorizontal="@dimen/_52sdp"
-        android:layout_marginBottom="@dimen/_18sdp"
-        android:background="@drawable/bg_btn_rectangle"
-        android:visibility="visible"
+        android:layout_height="2dp"
+        android:background="@color/sub_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/linerBottom"
+       />
+
+    <LinearLayout
+        android:id="@+id/linerBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/_8sdp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-
         <ImageView
-            android:id="@+id/ivCart"
+            android:id="@+id/ivShare"
             android:layout_width="@dimen/_24sdp"
             android:layout_height="@dimen/_24sdp"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="@dimen/_8sdp"
-            android:src="@drawable/iv_cart" />
+            android:layout_weight="1"
+            android:src="@drawable/iv_share" />
+
+        <ImageView
+            android:id="@+id/ivWAShare"
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_22sdp"
+            android:layout_weight="1"
+            android:src="@drawable/iv_share_whatsapp" />
 
 
-        <TextView
-            android:id="@+id/txtSubtotalRS"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_2sdp"
-            android:layout_marginTop="@dimen/_4sdp"
-            android:layout_toStartOf="@id/btn_Click_RequestOrder"
-            android:layout_toEndOf="@id/ivCart"
-            android:fontFamily="@font/roboto_medium"
-            android:gravity="left"
-            android:includeFontPadding="false"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:singleLine="true"
-            android:text="0"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/txtTotalItem"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtSubtotalRS"
-            android:layout_marginStart="@dimen/_2sdp"
-            android:layout_toStartOf="@id/btn_Click_RequestOrder"
-            android:layout_toEndOf="@id/ivCart"
-            android:fontFamily="@font/roboto_medium"
-            android:gravity="left"
-            android:includeFontPadding="false"
-            android:maxLines="1"
-            android:paddingHorizontal="@dimen/_5sdp"
-            android:text="0 Item"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/btn_Click_RequestOrder"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/_10sdp"
-            android:fontFamily="@font/roboto_bold"
-            android:gravity="center"
-            android:includeFontPadding="false"
-            android:paddingHorizontal="@dimen/_6sdp"
-            android:text="Request Order"
-            android:textColor="@color/white"
-            android:textSize="15sp" />
-    </RelativeLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

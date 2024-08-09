@@ -8,11 +8,11 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 
-@Database(entities = [AccountMaster::class,ItemMaster::class], version = 1, exportSchema = false)
+@Database(entities = [AccountMaster::class,ItemMaster::class,InvoiceMaster::class], version = 1, exportSchema = false)
 abstract class MasterDatabase : RoomDatabase(){
     abstract fun accountDao() : AccountDao
     abstract fun itemDao() : ItemDao
-   // abstract fun invoiceDao():InvoiceDao
+    abstract fun invoiceDao():InvoiceDao
     companion object{
 
         @Volatile

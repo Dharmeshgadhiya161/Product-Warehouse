@@ -33,7 +33,7 @@
             android:gravity="center"
             android:text="@string/app_name"
             android:textColor="@color/black"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
 
         <TextView
@@ -78,13 +78,12 @@
         <TextView
             android:id="@+id/btn_Login"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="22dp"
+            android:layout_height="46dp"
+            android:layout_marginHorizontal="28dp"
             android:layout_marginBottom="@dimen/_25sdp"
-            android:background="@drawable/ic_btn_shedow_blue"
+            android:background="@drawable/bg_btn_rectangle"
             android:fontFamily="@font/roboto_bold"
             android:gravity="center"
-            android:paddingBottom="@dimen/_14sdp"
             android:text="Login"
             android:textColor="@color/white"
             android:textSize="18sp"

@@ -13,7 +13,8 @@ import com.sunil.dhwarehouse.databinding.AccountItemRowBinding
 class AccountDataAdapter(
     var context: Activity,
     private var masterMutableList: MutableList<AccountMaster>,
-    private var query: String = ""
+    private var query: String = "",
+   var userName:String
 ) :
     RecyclerView.Adapter<AccountDataAdapter.MyAccountHolder>() {
     private var filteredDataList: MutableList<AccountMaster> = masterMutableList.toMutableList()
@@ -32,12 +33,12 @@ class AccountDataAdapter(
     }
 
     override fun onBindViewHolder(holder: MyAccountHolder, position: Int) {
-        holder.bind(masterMutableList[position], query, context)
+        holder.bind(masterMutableList[position], query, context,userName)
     }
 
     class MyAccountHolder(private val binding: AccountItemRowBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(accountMaster: AccountMaster, query1: String, context: Activity) {
+        fun bind(accountMaster: AccountMaster, query1: String, context: Activity, getUserName:String) {
             binding.txtAccountName.setHighlightText(
                 accountMaster.account_name,
                 query1,
@@ -52,9 +53,12 @@ class AccountDataAdapter(
 
             binding.cardV.setOnClickListener {
                 val intent = Intent(context, ItemProductActivity::class.java)
+                intent.putExtra("getUserName",getUserName)
                 intent.putExtra("MedicalName", accountMaster.account_name)
                 intent.putExtra("MedicalAddress", accountMaster.addess)
+                intent.putExtra("MobileNo", accountMaster.mobile_no)
                 context.startActivity(intent)
+                context.overridePendingTransition(R.anim.enter_animation, R.anim.exit_animation)
             }
 
         }

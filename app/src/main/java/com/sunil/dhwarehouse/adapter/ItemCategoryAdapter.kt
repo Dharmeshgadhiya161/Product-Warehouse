@@ -21,7 +21,6 @@ class ItemCategoryAdapter(
     class MyItemCategoryHolder(val binding: ItemCategroyRowBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-
         fun bind(categoryName: String) {
             binding.txtItemCategory.text = categoryName
         }
@@ -35,14 +34,18 @@ class ItemCategoryAdapter(
 
     override fun getItemCount(): Int = categoryList.size
 
+
+    fun updateRefreshSelectPos(selectedItemPosition1: Int) {
+        this.selectedItemPosition = selectedItemPosition1
+    }
+
     override fun onBindViewHolder(holder: MyItemCategoryHolder, position: Int) {
         holder.bind(categoryList[position])
-
 
         if (position == selectedItemPosition) {
             holder.binding.cardClick.setCardBackgroundColor(context.getColor(R.color.colorAccent))
             holder.binding.txtItemCategory.setTextColor(context.getColor(R.color.white))
-        }else{
+        } else {
             holder.binding.cardClick.setCardBackgroundColor(context.getColor(R.color.white))
             holder.binding.txtItemCategory.setTextColor(context.getColor(R.color.black))
         }

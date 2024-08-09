@@ -1,11 +1,8 @@
 package com.sunil.dhwarehouse.Activity
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -18,7 +15,7 @@ import com.sunil.dhwarehouse.RoomDB.ItemDao
 import com.sunil.dhwarehouse.RoomDB.ItemMaster
 import com.sunil.dhwarehouse.RoomDB.MasterDatabase
 import com.sunil.dhwarehouse.adapter.ItemCategoryAdapter
-import com.sunil.dhwarehouse.common.MyAdapter
+import com.sunil.dhwarehouse.adapter.ItemProductAdapter
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityItemProductBinding
 import kotlinx.coroutines.Dispatchers
@@ -34,10 +31,11 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private lateinit var itemCategoryList1: MutableList<String>
     private lateinit var uniqueList: MutableList<String>
     private lateinit var itemCategoryAdapter: ItemCategoryAdapter
-
-    //    private lateinit var itemProductAdapter: ItemProductAdapter
-    private lateinit var itemProductAdapter: MyAdapter
+    private lateinit var itemProductAdapter: ItemProductAdapter
     private var TAG = "ItemProductActivity"
+    private var getUserName=""
+    private var medicalAddress = ""
+    private var mobileNo = ""
     private var medicalName = ""
     private var itemCategoryName = ""
     private var all = "ALL"
@@ -56,7 +54,13 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
             insets
         }
 
+        getUserName = intent.getStringExtra("getUserName").toString()
         medicalName = intent.getStringExtra("MedicalName").toString()
+        medicalAddress = intent.getStringExtra("MedicalAddress").toString()
+        mobileNo = intent.getStringExtra("MobileNo").toString()
+
+
+
         binding.txtMedicalName.text = medicalName
 
         itemMasterList = ArrayList()
@@ -114,7 +118,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                 productWiseItemList.addAll(itemMasterList)
 
                 itemProductAdapter =
-                    MyAdapter(
+                    ItemProductAdapter(
                         this@ItemProductActivity,
                         productWiseItemList,
                         "",
@@ -135,12 +139,13 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
         }
 
         binding.btnClickRequestOrder.setOnClickListener {
-            //showBottomSheetDialog(itemMasterList, accountDao)
             val intent = Intent(this@ItemProductActivity, ReviewOderItemActivity::class.java)
-//            intent.putExtra("MedicalName", putExtraaccountMaster.account_name)
-//            intent.putExtra("MedicalAddress", accountMaster.addess)
+            intent.putExtra("getUserName",getUserName)
+            intent.putExtra("MedicalName", medicalName)
+            intent.putExtra("MedicalAddress", medicalAddress)
+            intent.putExtra("MobileNo", mobileNo)
             startActivity(intent)
-
+            overridePendingTransition(R.anim.enter_animation, R.anim.exit_animation)
         }
 
     }
@@ -156,7 +161,6 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     }
 
     override fun onClickItemCat(categorySelect: String) {
-        //  Log.e(TAG, "onClickItemCat:--> $categorySelect")
         productWiseItemList.clear()
         for (item in itemMasterList) {
             if (categorySelect == all) {
@@ -203,6 +207,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
 
                 productWiseItemList.addAll(itemMasterList)
                 withContext(Dispatchers.Main) {
+                    //itemCategoryAdapter.updateRefreshSelectPos(0)
                     itemProductAdapter.updateData(productWiseItemList, "")
                     itemProductAdapter.updateTotalData(itemMasterList)
                     UtilsFile.isChangeValues = false

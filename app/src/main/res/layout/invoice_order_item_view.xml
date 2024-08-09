@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <LinearLayout
+        android:id="@+id/linerBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/col_table_line_1"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/txtItemProductName"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="2.2"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:paddingLeft="@dimen/_2sdp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textAlignment="textStart" />
+
+        <TextView
+            android:id="@+id/txtQty"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/txtQtyFree"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/txtScm"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="0.8"
+            android:textAlignment="center" />
+
+
+        <TextView
+            android:id="@+id/txtSaleRate"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/txtSubTotal"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textAlignment="center" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/col_table_line_2"
+        app:layout_constraintTop_toBottomOf="@+id/linerBottom" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
