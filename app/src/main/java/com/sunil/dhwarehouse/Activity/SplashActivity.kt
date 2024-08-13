@@ -60,7 +60,8 @@ class SplashActivity : AppCompatActivity() {
                                 item.edtxt_scm = 0.0
                                 item.txt_net_rate = 0.0
                                 item.txt_subTotal = 0.0
-
+                                item.stock_qty = item.old_stockQty
+                                item.margin = item.old_margin
                                 accountDao.updateItem(item)
 
                             }

@@ -15,7 +15,8 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/roboto_medium"
         android:padding="@dimen/_6sdp"
-        android:text="All"
+        android:text="ALL"
+
         android:textColor="@color/sub_text"
         android:textSize="13sp" />
 

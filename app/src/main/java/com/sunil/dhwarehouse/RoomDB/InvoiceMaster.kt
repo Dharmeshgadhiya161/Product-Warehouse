@@ -2,8 +2,12 @@ package com.sunil.dhwarehouse.RoomDB
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 
 @Entity(tableName = "invoice_master")
+@Parcelize
 data class InvoiceMaster(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     var salesName: String = "",
@@ -19,4 +23,4 @@ data class InvoiceMaster(
     var rate: Double = 0.0,
     var subTotal: Double = 0.0,
 
-)
+) : Parcelable

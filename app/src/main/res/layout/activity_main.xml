@@ -45,9 +45,18 @@
                 android:id="@+id/ivExcelFile"
                 android:layout_width="@dimen/_26sdp"
                 android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/ivLogOut"
+                android:padding="@dimen/_3sdp"
+                android:layout_marginRight="@dimen/_4sdp"
+                android:src="@drawable/iv_excel_file" />
+
+            <ImageView
+                android:id="@+id/ivLogOut"
+                android:layout_width="@dimen/_26sdp"
+                android:layout_height="match_parent"
                 android:layout_alignParentEnd="true"
                 android:padding="@dimen/_3sdp"
-                android:src="@drawable/iv_excel_file" />
+                android:src="@drawable/iv_switch" />
 
         </RelativeLayout>
 
@@ -175,10 +184,10 @@
         android:id="@+id/ivInvoiceClick"
         android:layout_width="@dimen/_36sdp"
         android:layout_height="@dimen/_36sdp"
-        android:background="@drawable/bills"
-        android:visibility="gone"
         android:layout_marginRight="@dimen/_10sdp"
         android:layout_marginBottom="@dimen/_15sdp"
+        android:background="@drawable/bills"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

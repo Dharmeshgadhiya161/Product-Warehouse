@@ -63,10 +63,10 @@ class UtilsFile {
     }
 
 
-    fun getFormattedDateTime(dateFormat: String, timeFormat: String): Pair<String, String> {
+    fun getFormattedDateTime(): Pair<String, String> {
         val calendar = Calendar.getInstance()
-        val dateFormatter = SimpleDateFormat(dateFormat, Locale.getDefault())
-        val timeFormatter = SimpleDateFormat(timeFormat, Locale.getDefault())
+        val dateFormatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val timeFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
         val formattedDate = dateFormatter.format(calendar.time)
         val formattedTime = timeFormatter.format(calendar.time)

@@ -14,11 +14,15 @@ import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 
-class ExcelFileHandler(private val context: Context,private val sharedPrefManager: SharedPrefManager) {
+class ExcelFileHandler(
+    private val context: Context,
+    private val sharedPrefManager: SharedPrefManager
+) {
 
     companion object {
         private const val TAG = "ExcelFileHandler"
     }
+
     suspend fun readExcelAccountMasterFile(uri: Uri): ArrayList<AccountMaster> {
         return withContext(Dispatchers.IO) {
             Log.d("Excel Data", "Account Master Start1")
@@ -79,6 +83,7 @@ class ExcelFileHandler(private val context: Context,private val sharedPrefManage
             return@withContext aryAccount
         }
     }
+
     suspend fun readExcelItemMasterFile(uri: Uri): ArrayList<ItemMaster> {
         return withContext(Dispatchers.IO) {
             Log.d(TAG, "Item Master Start1")
@@ -142,14 +147,14 @@ class ExcelFileHandler(private val context: Context,private val sharedPrefManage
                                 itemMaster.txt_subTotal = cell.numericCellValue
                             else if (index == 15)
                                 itemMaster.old_margin = cell.numericCellValue
-
                             else if (index == 16)
-                                itemMaster.isMarginCustom = false
+                                itemMaster.old_stockQty = cell.numericCellValue
 
                             index++
                         }
                     }
 
+                    itemMaster.old_stockQty = itemMaster.stock_qty
                     //TODO Copy margin to old_margin after setting all values
                     itemMaster.old_margin = itemMaster.margin
 

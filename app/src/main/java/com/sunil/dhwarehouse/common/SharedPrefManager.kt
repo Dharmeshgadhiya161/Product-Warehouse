@@ -13,7 +13,10 @@ class SharedPrefManager(private var mContext:Context) {
     private val isReadAccountExcel = "ReadAccountExcelShow"
     private val isReadItemExcel = "ReadItemExcelShow"
 
-
+    fun clearAllSharedPrefManager() {
+        editor.clear()
+        editor.apply()
+    }
     var getUserName: String?
         get() = sharedPref.getString(userName, "")
         set(setUserName) = storeString(userName, setUserName)

@@ -10,9 +10,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.view.WindowManager
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -25,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.sunil.dhwarehouse.Activity.InvoiceBilActivity
+import com.sunil.dhwarehouse.Activity.LoginUserActivity
 import com.sunil.dhwarehouse.RoomDB.AccountMaster
 import com.sunil.dhwarehouse.RoomDB.ItemMaster
 import com.sunil.dhwarehouse.RoomDB.MasterDatabase
@@ -36,6 +39,9 @@ import com.sunil.dhwarehouse.common.SharedPrefManager
 import com.sunil.dhwarehouse.common.ShowingDialog
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityMainBinding
+import com.sunil.dhwarehouse.databinding.DialogChangeExcelBinding
+import com.sunil.dhwarehouse.databinding.DialogDeleteItemBinding
+import com.sunil.dhwarehouse.databinding.DialogLogoutAccountBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -54,8 +60,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var filteredListMain: MutableList<AccountMaster>
     private lateinit var itemMasterList: MutableList<ItemMaster>
     private lateinit var dialog: Dialog
+    private lateinit var dialogLogOut: Dialog
     private lateinit var storageReference: StorageReference
-    private var getUserName=""
+    private var getUserName = ""
 
 
     var TAG = "MainActivity"
@@ -74,6 +81,7 @@ class MainActivity : AppCompatActivity() {
 
         storageReference = FirebaseStorage.getInstance().reference
         dialog = Dialog(this)
+        dialogLogOut = Dialog(this)
         getUserName = sharedPrefManager.getUserName.toString()
         setProgressShowDialog(this, "Loading.. Excel File!")
 
@@ -95,6 +103,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.ivExcelFile.setOnClickListener {
             showAddExcelFileDialog(dialog)
+        }
+
+        binding.ivLogOut.setOnClickListener {
+            showLogOutAccountDialog(dialogLogOut)
         }
 
         binding.ivInvoiceClick.setOnClickListener {
@@ -197,7 +209,8 @@ class MainActivity : AppCompatActivity() {
                 if (dayWiseAryAccount1.size != 0) {
                     binding.rvAllAccount.visibility = View.VISIBLE
                     binding.layoutNoData.constNoDataLay.visibility = View.GONE
-                    accountDataAdapter = AccountDataAdapter(this@MainActivity, dayWiseAryAccount1,"",getUserName)
+                    accountDataAdapter =
+                        AccountDataAdapter(this@MainActivity, dayWiseAryAccount1, "", getUserName)
                     binding.rvAllAccount.layoutManager = LinearLayoutManager(this@MainActivity)
                     binding.rvAllAccount.adapter = accountDataAdapter
                     if (showingDialog.isShowing) {
@@ -226,6 +239,7 @@ class MainActivity : AppCompatActivity() {
                             item.edtxt_scm = 0.0
                             item.txt_net_rate = 0.0
                             item.txt_subTotal = 0.0
+                            item.stock_qty = item.old_stockQty
                             item.margin = item.old_margin
                             accountDao1.updateItem(item)
                         }
@@ -244,8 +258,9 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun showAddExcelFileDialog(dialog: Dialog) {
-
-        dialog.setContentView(R.layout.dialog_change_excel)
+        val binding: DialogChangeExcelBinding =
+            DialogChangeExcelBinding.inflate(LayoutInflater.from(this@MainActivity))
+        dialog.setContentView(binding.root)
         dialog.window?.setLayout(
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT
         )
@@ -254,22 +269,76 @@ class MainActivity : AppCompatActivity() {
         dialog.setCancelable(false)
         dialog.show()
 
-        dialog.findViewById<TextView>(R.id.btnAccountExcel).setOnClickListener {
+        binding.ivClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        binding.btnAccountExcel.setOnClickListener {
             if (NetworkUtil.isInternetAvailable(this)) {
+                binding.btnAccountExcel.isEnabled = false
+
                 downloadAccountMasterFile()
             } else {
                 DialogUtil.showNoInternetDialog(this)
             }
         }
 
-        dialog.findViewById<TextView>(R.id.btnItemExcel).setOnClickListener {
+        binding.btnItemExcel.setOnClickListener {
             if (NetworkUtil.isInternetAvailable(this)) {
+                binding.btnItemExcel.isEnabled = false
                 downloadItemMasterFile()
             } else {
                 DialogUtil.showNoInternetDialog(this)
             }
         }
 
+    }
+
+    private fun showLogOutAccountDialog(dialog: Dialog) {
+        val binding: DialogLogoutAccountBinding =
+            DialogLogoutAccountBinding.inflate(LayoutInflater.from(this@MainActivity))
+        dialog.setContentView(binding.getRoot())
+
+        dialog.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
+        dialog.show()
+        binding.txtDialogDes.text = getUserName
+        binding.ivClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        binding.btnAccountYes.setOnClickListener {
+            setProgressShowDialog(this@MainActivity, "Account Logout.!")
+            showingDialog.show()
+            dialog.dismiss()
+
+            accountLogoutDataClear(showingDialog)
+
+
+        }
+
+    }
+
+    private fun accountLogoutDataClear(showingDialog: ShowingDialog) {
+        sharedPrefManager.clearAllSharedPrefManager()
+
+        CoroutineScope(Dispatchers.IO).launch {
+
+            MasterDatabase.getDatabase(this@MainActivity).accountDao().deleteAllAccounts()
+            MasterDatabase.getDatabase(this@MainActivity).itemDao().deleteAllItems()
+            MasterDatabase.getDatabase(this@MainActivity).invoiceDao().deleteAllInvoiceItem()
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                Thread.sleep(400)
+                showingDialog.dismiss()
+                startActivity(Intent(this@MainActivity, LoginUserActivity::class.java))
+                finish()
+            }
+        }
+        dialog.dismiss()
     }
 
 
@@ -375,9 +444,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        if(UtilsFile.isFinishInvoice){
+        if (UtilsFile.isFinishInvoice) {
             finishAffinity()
-        }else{
+        } else {
             finishAffinity()
         }
     }

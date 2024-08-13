@@ -60,10 +60,41 @@
             android:layout_marginBottom="@dimen/_10sdp" />
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvItemCategory"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp" />
+            android:layout_height="50dp"
+            android:orientation="horizontal">
+
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardClick"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_margin="@dimen/_3sdp"
+                app:cardBackgroundColor="@color/colorAccent"
+                app:cardCornerRadius="@dimen/_14sdp">
+
+                <TextView
+                    android:id="@+id/txtItemCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:fontFamily="@font/roboto_medium"
+                    android:padding="@dimen/_6sdp"
+                    android:text=" ALL "
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+            </androidx.cardview.widget.CardView>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvItemCategory"
+                android:layout_width="match_parent"
+                tools:listitem="@layout/item_categroy_row"
+                android:layout_height="50dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -85,75 +116,75 @@
 
 
     <RelativeLayout
-    android:id="@+id/btn_RequestOrder"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:layout_marginHorizontal="@dimen/_66sdp"
-    android:layout_marginBottom="@dimen/_18sdp"
-    android:background="@drawable/bg_btn_rectangle"
-    android:visibility="gone"
-    app:layout_constraintBottom_toBottomOf="parent">
+        android:id="@+id/btn_RequestOrder"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="@dimen/_66sdp"
+        android:layout_marginBottom="@dimen/_18sdp"
+        android:background="@drawable/bg_btn_rectangle"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent">
 
 
-    <ImageView
-        android:id="@+id/ivCart"
-        android:layout_width="@dimen/_24sdp"
-        android:layout_height="@dimen/_24sdp"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/_10sdp"
-        android:src="@drawable/iv_cart" />
+        <ImageView
+            android:id="@+id/ivCart"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:src="@drawable/iv_cart" />
 
 
-    <TextView
-        android:id="@+id/txtSubtotalRS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_2sdp"
-        android:layout_marginTop="@dimen/_4sdp"
-        android:layout_toStartOf="@id/btn_Click_RequestOrder"
-        android:layout_toEndOf="@id/ivCart"
-        android:fontFamily="@font/roboto_medium"
-        android:gravity="left"
-        android:includeFontPadding="false"
-        android:paddingHorizontal="@dimen/_5sdp"
-        android:singleLine="true"
-        android:text="0"
-        android:textColor="@color/white"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtSubtotalRS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_2sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:layout_toStartOf="@id/btn_Click_RequestOrder"
+            android:layout_toEndOf="@id/ivCart"
+            android:fontFamily="@font/roboto_medium"
+            android:gravity="left"
+            android:includeFontPadding="false"
+            android:paddingHorizontal="@dimen/_5sdp"
+            android:singleLine="true"
+            android:text="0"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/txtTotalItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtSubtotalRS"
-        android:layout_marginStart="@dimen/_2sdp"
-        android:layout_toStartOf="@id/btn_Click_RequestOrder"
-        android:layout_toEndOf="@id/ivCart"
-        android:fontFamily="@font/roboto_medium"
-        android:gravity="left"
-        android:includeFontPadding="false"
-        android:maxLines="1"
-        android:paddingHorizontal="@dimen/_5sdp"
-        android:text="0 Item"
-        android:textColor="@color/white"
-        android:textSize="16sp" />
+        <TextView
+            android:id="@+id/txtTotalItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txtSubtotalRS"
+            android:layout_marginStart="@dimen/_2sdp"
+            android:layout_toStartOf="@id/btn_Click_RequestOrder"
+            android:layout_toEndOf="@id/ivCart"
+            android:fontFamily="@font/roboto_medium"
+            android:gravity="left"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:paddingHorizontal="@dimen/_5sdp"
+            android:text="0 Item"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/btn_Click_RequestOrder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="@dimen/_10sdp"
-        android:fontFamily="@font/roboto_bold"
-        android:gravity="center"
-        android:includeFontPadding="false"
-        android:paddingHorizontal="@dimen/_6sdp"
-        android:text="Review\nOrder"
-        android:layout_centerVertical="true"
-        android:textColor="@color/white"
-        android:textSize="15sp" />
+        <TextView
+            android:id="@+id/btn_Click_RequestOrder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:fontFamily="@font/roboto_bold"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:paddingHorizontal="@dimen/_6sdp"
+            android:text="Review\nOrder"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
 
 
-</RelativeLayout>
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,8 @@ plugins {
     id ("com.google.gms.google-services") // Add this line
     // Add the dependency for the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics")
+    id ("kotlin-parcelize")
+
 }
 android {
     namespace = "com.sunil.dhwarehouse"

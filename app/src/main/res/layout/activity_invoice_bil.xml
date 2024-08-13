@@ -12,9 +12,9 @@
     <RelativeLayout
         android:id="@+id/linerHeader"
         android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
         android:layout_marginHorizontal="@dimen/_8sdp"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="?actionBarSize">
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/ivBack"
@@ -22,16 +22,16 @@
             android:layout_height="match_parent"
             android:layout_alignParentStart="true"
             android:padding="@dimen/_2sdp"
-            android:visibility="visible"
-            android:src="@drawable/back_arrow_circular_button" />
+            android:src="@drawable/back_arrow_circular_button"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/txt_Username"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/_3sdp"
-            android:layout_toRightOf="@id/ivBack"
             android:layout_toLeftOf="@id/ivExcelFile"
+            android:layout_toRightOf="@id/ivBack"
             android:fontFamily="@font/roboto_medium"
             android:gravity="center"
             android:text="INVOICE"
@@ -45,8 +45,8 @@
             android:layout_alignParentEnd="true"
             android:padding="@dimen/_3sdp"
 
-            android:visibility="invisible"
-            android:src="@drawable/iv_excel_file" />
+            android:src="@drawable/iv_excel_file"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 
@@ -57,6 +57,7 @@
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/_8sdp"
         android:layout_marginTop="@dimen/_5sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linerHeader" />
 
     <include
@@ -64,8 +65,7 @@
         layout="@layout/layout_no_data_found"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

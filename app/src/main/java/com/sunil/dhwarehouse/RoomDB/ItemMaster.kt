@@ -22,5 +22,5 @@ data class ItemMaster(
     var txt_net_rate: Double = 0.0,
     var txt_subTotal: Double = 0.0,
     var old_margin: Double = 0.0,
-    var isMarginCustom: Boolean = false
+    var old_stockQty: Double = 0.0
 )

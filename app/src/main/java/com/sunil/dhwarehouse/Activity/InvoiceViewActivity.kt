@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -33,8 +32,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 class InvoiceViewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInvoiceViewBinding
@@ -47,6 +44,8 @@ class InvoiceViewActivity : AppCompatActivity() {
     private var medicalName = ""
     var date = ""
     var time = ""
+    private lateinit var invoiceListBilAct: MutableList<InvoiceMaster>
+    private var isInvoiceBilActivity: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,28 +61,41 @@ class InvoiceViewActivity : AppCompatActivity() {
         // Request storage permissions
         //requestStoragePermissions()
 
-        getUserName = intent.getStringExtra("getUserName").toString()
-        medicalName = intent.getStringExtra("MedicalName").toString()
-        medicalAddress = intent.getStringExtra("MedicalAddress").toString()
-        mobileNo = intent.getStringExtra("MobileNo").toString()
-        date = intent.getStringExtra("Date").toString()
-        time = intent.getStringExtra("Time").toString()
+        isInvoiceBilActivity = intent.getBooleanExtra("isInvoiceBilActivity", false)
 
-        println("Date: $date")
-        println("Time: $time")
-        fetchAndUpdateData()
+        if (isInvoiceBilActivity) {
+            invoiceListBilAct = (intent.getParcelableArrayListExtra<InvoiceMaster>("invoice_list")
+                ?: emptyList()).toMutableList()
+            Log.e("TAG", "isInvoiceBilActivity-->: ${invoiceListBilAct.size}")
+            fetchDataInvoiceBilActivity()
+        } else {
 
-        binding.txtUsername.text = medicalName
-        binding.txtDateTime.text = (date + " " + time)
-        binding.txtMedicalAddress.text = medicalAddress
-        binding.txtMedicalPhone.text = mobileNo
+            getUserName = intent.getStringExtra("getUserName").toString()
+            medicalName = intent.getStringExtra("MedicalName").toString()
+            medicalAddress = intent.getStringExtra("MedicalAddress").toString()
+            mobileNo = intent.getStringExtra("MobileNo").toString()
+            date = intent.getStringExtra("Date").toString()
+            time = intent.getStringExtra("Time").toString()
 
+            println("Date: $date")
+            println("Time: $time")
+            fetchAndUpdateData()
+
+            binding.txtUsername.text = medicalName
+            binding.txtDateTime.text = (date + " " + time)
+            binding.txtMedicalAddress.text = medicalAddress
+            binding.txtMedicalPhone.text = mobileNo
+        }
         binding.ivShare.setOnClickListener {
-            saveCsvFile(false)
+            if (isInvoiceBilActivity) {
+                saveCsvFile(invoiceListBilAct, false, medicalName)
+            } else {
+                saveCsvFile(invoicesList, false, medicalName)
+            }
         }
 
         binding.ivWAShare.setOnClickListener {
-            saveCsvFile(true)
+            saveCsvFile(invoicesList, true, medicalName)
         }
 
         binding.ivBack.setOnClickListener {
@@ -91,9 +103,15 @@ class InvoiceViewActivity : AppCompatActivity() {
         }
 
         binding.ivFileDownload.setOnClickListener {
-          //  startActivity(Intent(this@InvoiceViewActivity, InvoiceBilActivity::class.java))
-          //  overridePendingTransition(R.anim.enter_animation, R.anim.exit_animation)
-           // finish()
+            //  startActivity(Intent(this@InvoiceViewActivity, InvoiceBilActivity::class.java))
+            //  overridePendingTransition(R.anim.enter_animation, R.anim.exit_animation)
+            // finish()
+
+//                if (isInvoiceBilActivity){
+//                    deleteLastItem(invoiceListBilAct)
+//                }else{
+//                    deleteLastItem(invoicesList)
+//                }
         }
     }
 
@@ -105,8 +123,6 @@ class InvoiceViewActivity : AppCompatActivity() {
                     MasterDatabase.getDatabase(this@InvoiceViewActivity).invoiceDao()
                 val invoices = fetchedInvoices.getInvoiceMaster().toMutableList()
 
-                // Initialize invoicesList
-                //invoicesList = mutableListOf<InvoiceMaster>()
 
                 // Filter invoices based on account_name
                 invoicesList.clear()
@@ -119,11 +135,42 @@ class InvoiceViewActivity : AppCompatActivity() {
                 // Update the adapter with the filtered list
                 withContext(Dispatchers.Main) {
                     // Calculate totals
-                    val totalItems = invoicesList.size
+                    val totalItems = invoicesList.sumOf { it.qty }
                     val totalAmount = invoicesList.sumOf { it.subTotal }
                     invoiceViewAdapter = InvoiceViewAdapter(
                         this@InvoiceViewActivity,
                         invoicesList,
+                        totalItems.toInt(),
+                        UtilsFile().roundValues(totalAmount)
+                    )
+                    binding.rvInvoice.layoutManager = LinearLayoutManager(this@InvoiceViewActivity)
+                    binding.rvInvoice.adapter = invoiceViewAdapter
+                }
+            } catch (e: Exception) {
+                Log.e("TAG", "Error fetching invoices: ${e.message}")
+            }
+        }
+    }
+
+
+    private fun fetchDataInvoiceBilActivity() {
+        GlobalScope.launch(Dispatchers.IO) {
+            for (item in invoiceListBilAct) {
+                medicalName = item.account_name
+                binding.txtUsername.text = item.account_name
+                binding.txtDateTime.text = (item.date + " " + item.time)
+                binding.txtMedicalAddress.text = item.address
+                binding.txtMedicalPhone.text = item.mobile_no
+            }
+
+            try {
+                withContext(Dispatchers.Main) {
+                    // Calculate totals
+                    val totalItems = invoiceListBilAct.size
+                    val totalAmount = invoiceListBilAct.sumOf { it.subTotal }
+                    invoiceViewAdapter = InvoiceViewAdapter(
+                        this@InvoiceViewActivity,
+                        invoiceListBilAct,
                         totalItems,
                         UtilsFile().roundValues(totalAmount)
                     )
@@ -136,12 +183,16 @@ class InvoiceViewActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveCsvFile(isWAShare: Boolean) {
+    private fun saveCsvFile(
+        invoicesList: MutableList<InvoiceMaster>,
+        isWAShare: Boolean,
+        medicalName: String
+    ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // val invoices = getInvoicesFromDatabase()
                 if (invoicesList.isNotEmpty()) {
-                    val filePath = getCsvFilePath("invoices.csv")
+                    val filePath = getCsvFilePath(medicalName + "_invoice.csv")
                     val isSuccess = writeInvoicesToCsv(invoicesList, filePath)
 
                     withContext(Dispatchers.Main) {
@@ -151,7 +202,7 @@ class InvoiceViewActivity : AppCompatActivity() {
                             if (!isWAShare) {
                                 shareFile(this@InvoiceViewActivity, filePath)
                             } else {
-                               shareFileToWhatsApp(filePath)
+                                shareFileToWhatsApp(filePath)
                             }
                         } else {
                             Toast.makeText(
@@ -239,7 +290,7 @@ class InvoiceViewActivity : AppCompatActivity() {
         context.startActivity(Intent.createChooser(intent, "Share CSV File"))
     }
 
-    fun shareFileToWhatsApp(filePath: String) {
+    private fun shareFileToWhatsApp(filePath: String) {
         val file = File(filePath)
         val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             FileProvider.getUriForFile(this@InvoiceViewActivity, "$packageName.provider", file)
@@ -258,7 +309,8 @@ class InvoiceViewActivity : AppCompatActivity() {
         if (intent.resolveActivity(packageManager) != null) {
             startActivity(intent)
         } else {
-            Toast.makeText(this@InvoiceViewActivity, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@InvoiceViewActivity, "WhatsApp not installed", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -302,13 +354,49 @@ class InvoiceViewActivity : AppCompatActivity() {
             )
         }
     }
+//    private fun deleteLastItem(invoiceListBilAct: MutableList<InvoiceMaster>) {
+//
+//
+//        if (invoiceListBilAct.isNotEmpty()) {
+//            val position = invoiceListBilAct.size - 1 // Get the position of the last item
+//            val itemToDelete = invoiceListBilAct[position]
+//
+//            GlobalScope.launch(Dispatchers.IO) {
+//                try {
+//                    // Delete the item from the Room database
+//                    MasterDatabase.getDatabase(this@InvoiceViewActivity).invoiceDao().deleteInvoicesList(itemToDelete)
+//
+//                    // Update the UI on the main thread
+//                    withContext(Dispatchers.Main) {
+//                        invoiceListBilAct.removeAt(position)
+//                        invoiceViewAdapter.notifyItemRemoved(position)
+//                        invoiceViewAdapter.notifyItemRangeChanged(position, invoiceListBilAct.size)
+//
+//                        Toast.makeText(this@InvoiceViewActivity, "Last item deleted", Toast.LENGTH_SHORT).show()
+//
+//
+//                    }
+//                } catch (e: Exception) {
+//                    withContext(Dispatchers.Main) {
+//                        Toast.makeText(this@InvoiceViewActivity, "Error deleting item: ${e.message}", Toast.LENGTH_SHORT).show()
+//                    }
+//                }
+//            }
+//        } else {
+//            Toast.makeText(this, "No items to delete", Toast.LENGTH_SHORT).show()
+//        }
+//    }
 
 
     override fun onBackPressed() {
         super.onBackPressed()
-        startActivity(Intent(this@InvoiceViewActivity, MainActivity::class.java))
-        UtilsFile.isFinishInvoice = true
-        finish()
+        if (isInvoiceBilActivity) {
+            finish()
+        } else {
+            startActivity(Intent(this@InvoiceViewActivity, MainActivity::class.java))
+            UtilsFile.isFinishInvoice = true
+            finish()
+        }
     }
 }
 

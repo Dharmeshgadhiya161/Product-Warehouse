@@ -16,7 +16,7 @@ class ItemCategoryAdapter(
     private var clickItemCategory: ClickItemCategory
 ) :
     RecyclerView.Adapter<ItemCategoryAdapter.MyItemCategoryHolder>() {
-    private var selectedItemPosition: Int = 0
+    private var selectedItemPosition: Int = -1
 
     class MyItemCategoryHolder(val binding: ItemCategroyRowBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -37,6 +37,7 @@ class ItemCategoryAdapter(
 
     fun updateRefreshSelectPos(selectedItemPosition1: Int) {
         this.selectedItemPosition = selectedItemPosition1
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: MyItemCategoryHolder, position: Int) {

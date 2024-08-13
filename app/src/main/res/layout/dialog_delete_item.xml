@@ -5,27 +5,23 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/ivClose"
-        android:layout_width="@dimen/_20sdp"
-        android:layout_height="@dimen/_20sdp"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:background="@drawable/ic_cat_item"
-        android:src="@drawable/baseline_close_24"
-        android:layout_alignParentRight="true"
-        android:padding="@dimen/_3sdp"
-        android:elevation="@dimen/_24sdp"
-        android:layout_marginRight="@dimen/_34sdp" />
-
+        android:layout_width="@dimen/_28sdp"
+        android:layout_height="@dimen/_28sdp"
+        android:src="@drawable/iv_delete"
+        android:layout_centerHorizontal="true"
+        android:elevation="@dimen/_4sdp"
+        />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:layout_centerInParent="true"
-        android:layout_marginHorizontal="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_22sdp"
+        android:layout_marginHorizontal="@dimen/_36sdp"
+        android:layout_marginBottom="@dimen/_6sdp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="12dp"
-        app:cardElevation="4dp">
+        app:cardElevation="2dp">
 
 
         <LinearLayout
@@ -33,17 +29,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+
             <TextView
-                android:id="@+id/txtDialogDes"
+                android:id="@+id/txt_Medical_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_22sdp"
                 android:fontFamily="@font/roboto_bold"
                 android:gravity="center"
-                android:text="Update Excel File!"
+                android:text="Delete File!"
                 android:textColor="@color/black"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/txt_DataTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:includeFontPadding="false"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="Delete File!"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
 
             <LinearLayout
@@ -51,38 +61,37 @@
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="@dimen/_24sdp"
                 android:layout_marginTop="@dimen/_12sdp"
-                android:layout_marginBottom="@dimen/_8sdp"
-                android:orientation="vertical">
+                android:layout_marginBottom="@dimen/_12sdp"
+                android:orientation="horizontal">
 
 
                 <TextView
-                    android:id="@+id/btnAccountExcel"
-                    android:layout_width="@dimen/_130sdp"
+                    android:id="@+id/btnYes"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginRight="@dimen/_4sdp"
+                    android:layout_weight="1"
                     android:background="@drawable/bg_btn_rectangle"
-                    android:fontFamily="@font/roboto_medium"
+                    android:fontFamily="@font/roboto_bold"
                     android:gravity="center"
-                    android:padding="@dimen/_8sdp"
-                    android:text="Update Account Excel"
+                    android:padding="@dimen/_6sdp"
+                    android:text="Yes"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/btnItemExcel"
-                    android:layout_width="@dimen/_130sdp"
+                    android:id="@+id/btnNo"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="@dimen/_8sdp"
-                    android:layout_marginBottom="@dimen/_2sdp"
+                    android:layout_marginLeft="@dimen/_4sdp"
+                    android:layout_weight="1"
                     android:background="@drawable/bg_btn_rectangle"
-                    android:fontFamily="@font/roboto_medium"
+                    android:fontFamily="@font/roboto_bold"
                     android:gravity="center"
                     android:includeFontPadding="false"
-                    android:padding="@dimen/_8sdp"
-                    android:text="Update Item Excel"
+                    android:padding="@dimen/_6sdp"
+                    android:text="No"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="14sp"

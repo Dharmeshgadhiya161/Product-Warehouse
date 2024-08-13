@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.sunil.dhwarehouse.R
 import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
+import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.FooterItemRowBinding
 import com.sunil.dhwarehouse.databinding.InvoiceOrderItemViewBinding
 
@@ -73,24 +74,34 @@ class InvoiceViewAdapter(
                 )
             }
 
+//            for (index in 1 until invoicesList.size) {
+//                println("Element at index $index is ${invoicesList[index]}")
+//            }
+
+
+
             holder.binding.txtItemProductName.text =
                 invoiceMaster.productItemName
             holder.binding.txtItemProductName.setSelected(true)
             holder.binding.txtQty.text =
-                invoiceMaster.qty.toString()
+                invoiceMaster.qty.toInt().toString()
             holder.binding.txtQtyFree.text =
-                invoiceMaster.free.toString()
+                invoiceMaster.free.toInt().toString()
             holder.binding.txtScm.text =
                 invoiceMaster.scm.toString()
-            holder.binding.txtSaleRate.text =invoiceMaster.rate.toString()
-            holder.binding.txtSubTotal.text =invoiceMaster.subTotal.toString()
+            holder.binding.txtSaleRate.text =UtilsFile().roundValues(invoiceMaster.rate).toString()
+            holder.binding.txtSubTotal.text =UtilsFile().roundValues(invoiceMaster.subTotal).toString()
+
+
+
+
+
         } else if (holder is FooterViewHolder) {
 
-            holder.bindingFooter.txtTotalItem.text = "$totalItems"
-            holder.bindingFooter.txtTotalRs.text = "${context.getString(R.string.rs)} $totalAmount"
+            holder.bindingFooter.txtTotalItem.text =totalItems.toString()
+            holder.bindingFooter.txtTotalRs.text = "${context.getString(R.string.rs)}$totalAmount"
         }
     }
-
 
 //    override fun getItemCount(): Int = invoicesList.size
 

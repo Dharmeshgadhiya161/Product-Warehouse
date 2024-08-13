@@ -22,6 +22,7 @@ import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityReviewOderItemBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -112,6 +113,15 @@ class ReviewOderItemActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         UtilsFile.isChangeValues = true
+
+        if (selectItemList.size > 0) {
+            for (item in selectItemList) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    item.stock_qty = item.old_stockQty
+                    itemDao.updateItem(item)
+                }
+            }
+        }
 
     }
 

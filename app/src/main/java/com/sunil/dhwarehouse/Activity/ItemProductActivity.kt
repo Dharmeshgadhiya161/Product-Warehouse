@@ -22,8 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
-
 class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private lateinit var binding: ActivityItemProductBinding
     private lateinit var itemMasterList: MutableList<ItemMaster>
@@ -33,7 +31,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private lateinit var itemCategoryAdapter: ItemCategoryAdapter
     private lateinit var itemProductAdapter: ItemProductAdapter
     private var TAG = "ItemProductActivity"
-    private var getUserName=""
+    private var getUserName = ""
     private var medicalAddress = ""
     private var mobileNo = ""
     private var medicalName = ""
@@ -74,7 +72,6 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
             accountDao = MasterDatabase.getDatabase(this@ItemProductActivity).itemDao()
             itemMasterList = accountDao.getItemMaster().toMutableList()
 
-
             /*--------this Code first Time use default 0 position get--------------*/
             itemCategoryName = all
             //itemCategoryName = itemMasterList[0].category
@@ -83,9 +80,12 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
 
 
             withContext(Dispatchers.Main) {
+//                binding.cardClick.setCardBackgroundColor(getColor(R.color.colorAccent))
+//                binding.txtItemCategory.setTextColor(getColor(R.color.white))
+
 
                 for (item in itemMasterList) {
-                    itemCategoryList1.add(all)
+                    //  itemCategoryList1.add(all)
                     itemCategoryList1.add(item.category)
 
                 }
@@ -140,12 +140,26 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
 
         binding.btnClickRequestOrder.setOnClickListener {
             val intent = Intent(this@ItemProductActivity, ReviewOderItemActivity::class.java)
-            intent.putExtra("getUserName",getUserName)
+            intent.putExtra("getUserName", getUserName)
             intent.putExtra("MedicalName", medicalName)
             intent.putExtra("MedicalAddress", medicalAddress)
             intent.putExtra("MobileNo", mobileNo)
             startActivity(intent)
             overridePendingTransition(R.anim.enter_animation, R.anim.exit_animation)
+        }
+
+        binding.cardClick.setOnClickListener {
+            binding.cardClick.setCardBackgroundColor(getColor(R.color.colorAccent))
+            binding.txtItemCategory.setTextColor(getColor(R.color.white))
+
+            productWiseItemList.clear()
+            for (item in itemMasterList) {
+                productWiseItemList.add(item)
+            }
+
+            itemCategoryAdapter.updateRefreshSelectPos(-1)
+            itemProductAdapter.updateData(productWiseItemList, "")
+
         }
 
     }
@@ -166,6 +180,11 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
             if (categorySelect == all) {
                 productWiseItemList.add(item)
             } else if (item.category == categorySelect) {
+
+                binding.cardClick.setCardBackgroundColor(getColor(R.color.white))
+                binding.txtItemCategory.setTextColor(getColor(R.color.black))
+
+
                 productWiseItemList.add(item)
                 println("categorySelect: ${productWiseItemList.size}")
             }
@@ -188,6 +207,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                     item.txt_net_rate = 0.0
                     item.txt_subTotal = 0.0
                     item.margin = item.old_margin
+                    item.stock_qty = item.old_stockQty
                     accountDao.updateItem(item)
                 }
             }
@@ -207,7 +227,9 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
 
                 productWiseItemList.addAll(itemMasterList)
                 withContext(Dispatchers.Main) {
-                    //itemCategoryAdapter.updateRefreshSelectPos(0)
+                    itemCategoryAdapter.updateRefreshSelectPos(-1)
+                    binding.cardClick.setCardBackgroundColor(getColor(R.color.colorAccent))
+                    binding.txtItemCategory.setTextColor(getColor(R.color.white))
                     itemProductAdapter.updateData(productWiseItemList, "")
                     itemProductAdapter.updateTotalData(itemMasterList)
                     UtilsFile.isChangeValues = false

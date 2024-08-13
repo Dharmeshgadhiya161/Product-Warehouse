@@ -1,6 +1,7 @@
 package com.sunil.dhwarehouse.RoomDB
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -21,4 +22,11 @@ interface InvoiceDao {
 
     @Query("DELETE FROM invoice_master")
     suspend fun deleteAllInvoiceItem()
+
+
+    @Delete
+    suspend fun deleteInvoices(invoices: List<InvoiceMaster>)
+
+    @Delete
+    suspend fun deleteInvoicesList(invoices: InvoiceMaster)
 }

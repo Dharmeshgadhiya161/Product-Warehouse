@@ -20,6 +20,7 @@ import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
 import com.sunil.dhwarehouse.RoomDB.ItemDao
 import com.sunil.dhwarehouse.RoomDB.ItemMaster
 import com.sunil.dhwarehouse.common.ShowingDialog
+import com.sunil.dhwarehouse.common.ToastUtils
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ReviewOderItemRowBinding
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +50,7 @@ class ReviewOderItemAdapter(
     private var showingDialog: ShowingDialog
 ) : RecyclerView.Adapter<ReviewOderItemAdapter.ViewHolder>() {
     private var TAG = "ReviewOderItemAdapter"
+    var qtyTotalStock = 0.0
     var edtQtyNumber = ""
     var subTotalResult = " "
     var netSaleRate = 0.0
@@ -58,6 +60,7 @@ class ReviewOderItemAdapter(
     var selectItemList: MutableList<ItemMaster> = ArrayList()
     private var totalSubTotal = 0.0
     private var totalItem = 0
+    var isToastShown = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
@@ -215,7 +218,7 @@ class ReviewOderItemAdapter(
         btnClickRequestOrder.setOnClickListener {
             showingDialog.show()
             // Example usage
-            val (date, time) = UtilsFile().getFormattedDateTime("dd-MM-yyyy", "hh:mm a")
+            val (date, time) = UtilsFile().getFormattedDateTime()
             println("Date: $date")
             println("Time: $time")
             var invoice: InvoiceMaster
@@ -223,9 +226,9 @@ class ReviewOderItemAdapter(
             val invoicesToInsert = mutableListOf<InvoiceMaster>()
             for (item in selectItemList) {
 //                edtQtyNumber = holder.binding.txtTotalQty.text.toString()
-//                GlobalScope.launch(Dispatchers.IO) {
-//                    accountDao.updateItem(item = itemMaster.copy(stock_qty = edtQtyNumber.toDouble()))
-//                }
+                GlobalScope.launch(Dispatchers.IO) {
+                  //  accountDao.updateItem(item = itemMaster.copy(stock_qty = itemMasterList[position].old_stockQty))
+                }
 
                 invoice = InvoiceMaster(
                     salesName = getUserName,
@@ -349,17 +352,36 @@ class ReviewOderItemAdapter(
 
                 //todo Free Qty values hoy tare and editText ma qty change after total Qty - Free Qty
                 if (itemMasterList[position].edtxt_free > 0.0) {
-                    freeQty = itemMaster.stock_qty - itemMaster.edtxt_free - input.toDouble()
-                    binding.txtTotalQty.text = freeQty.toString()
+                    val qtyMinus = itemMaster.stock_qty - itemMaster.edtxt_free
+                    if (qtyMinus >= input.toDouble()) {
+                        freeQty = qtyMinus - input.toDouble()
+                        //  freeQty = itemMaster.stock_qty - itemMaster.edtxt_free - input.toDouble()
+                        binding.txtTotalQty.text = freeQty.toString()
+                        Log.e(TAG, "onTextChanged freeQtyQty NetSaleRate:<freeQty> $freeQty")
+                    //    itemMasterList[position].old_stockQty = freeQty
+                        updateQtyItem(input)
+                    } else {
+                        ToastUtils.showCustomToast(
+                            context,
+                            "Stock QTY Available :- " + itemMasterList[position].stock_qty.toInt(),
+                            Toast.LENGTH_SHORT
+                        )
+                        isToastShown = true
 
-                    Log.e(TAG, "onTextChanged freeQtyQty NetSaleRate:<freeQty> $freeQty")
-
-                    updateQtyItem(input)
-                    //TODO this code use already scm values edit box add and qty values add this code use
+                        GlobalScope.launch(Dispatchers.IO) {
+                            accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
+                            accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
+                            accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
+                        }
+                        binding.edtAddQty.text.clear()
+                    }
+                    //TODO this code use already scm values editText box add, and qty values add on this time code use
                 } else if (itemMasterList[position].edtxt_scm > 0.0) {
                     binding.txtCountQty.text = input
-                    binding.txtTotalQty.text =
-                        (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toString()
+                    qtyTotalStock = itemMaster.stock_qty - itemMasterList[position].edtxt_qty
+                    binding.txtTotalQty.text = qtyTotalStock.toString()
+
+                  //  itemMasterList[position].old_stockQty = qtyTotalStock
 
                     saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
                     scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
@@ -388,10 +410,35 @@ class ReviewOderItemAdapter(
                     binding.ivClearProduct.visibility = View.VISIBLE
                     binding.linerTotal.visibility = View.VISIBLE
                 } else {
-                    binding.txtTotalQty.text =
-                        (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toString()
-                    Log.e(TAG, "onTextChanged Qty NetSaleRate:<Qty>")
-                    updateQtyItem(input)
+                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
+                        qtyTotalStock = itemMaster.stock_qty - itemMasterList[position].edtxt_qty
+                        binding.txtTotalQty.text = qtyTotalStock.toString()
+
+                      //  itemMasterList[position].old_stockQty = qtyTotalStock
+
+                        updateQtyItem(input)
+                    } else {
+                        /*TODO this code Stock Qty  More Qty EditText in set Clear EditText ,All Data Clear */
+                        if (!isToastShown) {
+                            ToastUtils.showCustomToast(
+                                context,
+                                "Stock QTY Available :- " + itemMasterList[position].stock_qty.toInt(),
+                                Toast.LENGTH_SHORT
+                            )
+                            isToastShown = true
+
+                            GlobalScope.launch(Dispatchers.IO) {
+                                accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
+                                accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
+                                accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
+                            }
+                            binding.edtAddQty.text.clear()
+
+                            itemMasterList[position].edtxt_qty = 0.0
+                            itemMasterList[position].txt_net_rate = 0.0
+                            itemMasterList[position].txt_subTotal = 0.0
+                        }
+                    }
                 }
 
                 selectItemListData()
@@ -466,7 +513,7 @@ class ReviewOderItemAdapter(
         }
 
         override fun afterTextChanged(editable: Editable) {
-
+            isToastShown = false
         }
 
     }
@@ -508,15 +555,26 @@ class ReviewOderItemAdapter(
         ) {
             val input = charSequence.toString()
             if (input.isNotEmpty() && input.isNotBlank() && input != ".") {
-                itemMasterList[position].edtxt_free = input.toDouble()
-                freeQty = itemMaster.stock_qty - itemMaster.edtxt_qty - input.toDouble()
-                binding.txtTotalQty.text = freeQty.toString()
+                val qtyMinus = itemMaster.stock_qty - itemMaster.edtxt_qty
 
-                binding.edtAddScm.disable()
+                if (qtyMinus >= input.toDouble()) {
+                    freeQty = qtyMinus - input.toDouble()
+                    binding.txtTotalQty.text = freeQty.toInt().toString()
+                   // itemMasterList[position].old_stockQty = freeQty
+                    binding.edtAddScm.disable()
 
-                GlobalScope.launch(Dispatchers.IO) {
-                    accountDao.updateItem(item = itemMaster.copy(edtxt_free = itemMasterList[position].edtxt_free))
-                    accountDao.updateItem(item = itemMaster.copy(edtxt_scm = 0.0))
+                    GlobalScope.launch(Dispatchers.IO) {
+                        accountDao.updateItem(item = itemMaster.copy(edtxt_free = itemMasterList[position].edtxt_free))
+                        accountDao.updateItem(item = itemMaster.copy(edtxt_scm = 0.0))
+                    }
+                } else {
+                    ToastUtils.showCustomToast(
+                        context,
+                        "Stock QTY Available :- " + itemMasterList[position].stock_qty.toInt(),
+                        Toast.LENGTH_SHORT
+                    )
+                    binding.edtAddQtyFree.text.clear()
+                    binding.edtAddScm.enabled()
                 }
 
 
@@ -524,9 +582,13 @@ class ReviewOderItemAdapter(
                 binding.edtAddScm.enabled()
                 //TODO  free Data 0/empty kari tare.jo qty edit text data hoy tare total qty data update
                 if (itemMasterList[position].edtxt_qty > 0.0) {
-                    binding.txtTotalQty.text =
-                        (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toString()
+
+                    qtyTotalStock = (itemMaster.stock_qty - itemMasterList[position].edtxt_qty)
+                    binding.txtTotalQty.text = qtyTotalStock
+                        .toString()
                     itemMasterList[position].edtxt_free = 0.0
+
+                  //  itemMasterList[position].old_stockQty = qtyTotalStock
                 } else {
                     binding.txtTotalQty.text = itemMaster.stock_qty.toString()
                     itemMasterList[position].edtxt_free = 0.0
@@ -575,7 +637,7 @@ class ReviewOderItemAdapter(
                     saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
                     scmRs = (saleRate * ediScmValue) / 100
                     netSaleRate = saleRate - scmRs
-                    itemMasterList[position].txt_net_rate = netSaleRate
+                    itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
                     binding.txtNetSale.text =
                         "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
                     subTotalResult = calculateSubTotalRound(
@@ -780,5 +842,4 @@ class ReviewOderItemAdapter(
     fun EditText.enabled() {
         this.isEnabled = true
     }
-
 }
