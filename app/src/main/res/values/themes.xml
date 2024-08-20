@@ -21,8 +21,9 @@
     <style name="My_textStyle" parent="Widget.AppCompat.TextView">
         <item name="android:textSize">14sp</item>
         <item name="fontFamily">@font/roboto_medium</item>
-        <item name="android:paddingHorizontal">@dimen/_14sdp</item>
-        <item name="android:paddingVertical">@dimen/_5sdp</item>
+        <item name="android:paddingHorizontal">@dimen/_12sdp</item>
+        <item name="android:paddingVertical">@dimen/_4sdp</item>
+        <item name="android:gravity">center</item>
     </style>
 
 

@@ -1,27 +1,36 @@
-package com.sunil.dhwarehouse.Activity
+package com.sunil.dhwarehouse.activity
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.ClickItemCategory
-import com.sunil.dhwarehouse.RoomDB.ItemDao
-import com.sunil.dhwarehouse.RoomDB.ItemMaster
-import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.roomDB.ClickItemCategory
+import com.sunil.dhwarehouse.roomDB.ItemDao
+import com.sunil.dhwarehouse.roomDB.ItemMaster
+import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.adapter.ItemCategoryAdapter
 import com.sunil.dhwarehouse.adapter.ItemProductAdapter
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityItemProductBinding
+import com.sunil.dhwarehouse.databinding.DialogBackItemBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
 class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private lateinit var binding: ActivityItemProductBinding
     private lateinit var itemMasterList: MutableList<ItemMaster>
@@ -37,13 +46,12 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     private var medicalName = ""
     private var itemCategoryName = ""
     private var all = "ALL"
-    private lateinit var bottomSheetDialog: BottomSheetDialog
     private lateinit var accountDao: ItemDao
     private lateinit var selectItemList: MutableList<ItemMaster>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         binding = ActivityItemProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -58,15 +66,13 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
         mobileNo = intent.getStringExtra("MobileNo").toString()
 
 
-
         binding.txtMedicalName.text = medicalName
 
         itemMasterList = ArrayList()
         productWiseItemList = ArrayList()
         itemCategoryList1 = ArrayList()
         uniqueList = ArrayList()
-        selectItemList = ArrayList()
-        bottomSheetDialog = BottomSheetDialog(this@ItemProductActivity)
+//        selectItemList = ArrayList()
         lifecycleScope.launch(Dispatchers.IO) {
 
             accountDao = MasterDatabase.getDatabase(this@ItemProductActivity).itemDao()
@@ -80,9 +86,6 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
 
 
             withContext(Dispatchers.Main) {
-//                binding.cardClick.setCardBackgroundColor(getColor(R.color.colorAccent))
-//                binding.txtItemCategory.setTextColor(getColor(R.color.white))
-
 
                 for (item in itemMasterList) {
                     //  itemCategoryList1.add(all)
@@ -93,6 +96,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                     //TODO item in same Name item category remove list
                     if (item !in uniqueList) {
                         uniqueList.add(item)
+                        println("List after item removing duplicates: $item")
                     }
                 }
                 // Remove only the last blank string from the list
@@ -107,7 +111,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                 )
                 itemCategoryAdapter = ItemCategoryAdapter(
                     this@ItemProductActivity,
-                    uniqueList,
+                    filterAndSortList(uniqueList),
                     this@ItemProductActivity
                 )
 
@@ -161,7 +165,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
             itemProductAdapter.updateData(productWiseItemList, "")
 
         }
-
+//
     }
 
     private lateinit var filteredList: MutableList<ItemMaster>
@@ -193,11 +197,16 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        if (bottomSheetDialog.isShowing) {
-            bottomSheetDialog.dismiss()
+        if (UtilsFile.isQtyBack) {
+            showDeleteDialog()
+        } else {
+            super.onBackPressed()
+            itemDataClear()
         }
 
+    }
+
+    private fun itemDataClear() {
         if (itemMasterList.size > 0) {
             for (item in itemMasterList) {
                 GlobalScope.launch(Dispatchers.IO) {
@@ -207,7 +216,6 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                     item.txt_net_rate = 0.0
                     item.txt_subTotal = 0.0
                     item.margin = item.old_margin
-                    item.stock_qty = item.old_stockQty
                     accountDao.updateItem(item)
                 }
             }
@@ -233,14 +241,45 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                     itemProductAdapter.updateData(productWiseItemList, "")
                     itemProductAdapter.updateTotalData(itemMasterList)
                     UtilsFile.isChangeValues = false
-
                 }
-
             }
         }
 
+
     }
 
+    private fun filterAndSortList(inputList: MutableList<String>): MutableList<String> {
+        val uniqueList = inputList.toSet().toMutableList()
+        uniqueList.sortWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it })
+        return uniqueList
+    }
+
+    private fun showDeleteDialog(
+    ) {
+        val dialog = Dialog(this@ItemProductActivity)
+        val binding: DialogBackItemBinding =
+            DialogBackItemBinding.inflate(LayoutInflater.from(this@ItemProductActivity))
+        dialog.setContentView(binding.getRoot())
+        dialog.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
+        dialog.show()
+
+        binding.ivClose.setOnClickListener { dialog.dismiss() }
+        binding.btnYes.setOnClickListener {
+            finish()
+            UtilsFile.isQtyBack = false
+            itemDataClear()
+            dialog.dismiss()
+        }
+        binding.btnNo.setOnClickListener {
+            dialog.dismiss()
+        }
+
+    }
 
 }
 

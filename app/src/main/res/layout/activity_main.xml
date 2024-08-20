@@ -70,104 +70,115 @@
 
     </LinearLayout>
 
-    <HorizontalScrollView
-        android:id="@+id/horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/_8sdp"
-        android:scrollbarStyle="insideOverlay"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/linerHeader">
+<!--    <HorizontalScrollView-->
+<!--        android:id="@+id/horizontal"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="@dimen/_8sdp"-->
+<!--        android:scrollbarStyle="insideOverlay"-->
+<!--        android:scrollbars="none"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/linerHeader">-->
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/linerHor"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_7sdp"
+            app:layout_constraintTop_toBottomOf="@id/linerHeader"
             android:orientation="horizontal">
 
 
             <TextView
                 android:id="@+id/txt_all"
                 style="@style/My_textStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
-                android:background="@drawable/bg_select_rectangle"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/_3sdp"
+                android:background="@drawable/bg_un_select_rectangle"
                 android:text="All"
-                android:textColor="@color/white" />
+                android:textColor="@color/sub_text" />
 
             <TextView
                 android:id="@+id/txt_mon"
                 style="@style/My_textStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_marginRight="@dimen/_3sdp"
                 android:background="@drawable/bg_un_select_rectangle"
-                android:text="Mon"
+                android:text="M"
                 android:textColor="@color/sub_text" />
 
             <TextView
                 android:id="@+id/txt_tue"
                 style="@style/My_textStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/_3sdp"
                 android:background="@drawable/bg_un_select_rectangle"
-                android:text="Tue"
+                android:text="T"
                 android:textColor="@color/sub_text" />
 
             <TextView
                 android:id="@+id/txt_wed"
                 style="@style/My_textStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/_3sdp"
                 android:background="@drawable/bg_un_select_rectangle"
-                android:text="Wed"
+                android:text="W"
                 android:textColor="@color/sub_text" />
 
             <TextView
                 android:id="@+id/txt_thu"
                 style="@style/My_textStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/_3sdp"
                 android:background="@drawable/bg_un_select_rectangle"
-                android:text="Thu"
+                android:text="T"
                 android:textColor="@color/sub_text" />
 
             <TextView
                 android:id="@+id/txt_fri"
                 style="@style/My_textStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/_3sdp"
                 android:background="@drawable/bg_un_select_rectangle"
-                android:text="Fri"
+                android:text="F"
                 android:textColor="@color/sub_text" />
 
             <TextView
                 android:id="@+id/txt_sat"
                 style="@style/My_textStyle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
+                android:layout_weight="1"
+                android:layout_marginRight="@dimen/_3sdp"
                 android:background="@drawable/bg_un_select_rectangle"
-                android:text="Sat"
+                android:text="S"
                 android:textColor="@color/sub_text" />
 
-            <TextView
-                android:id="@+id/txt_sun"
-                style="@style/My_textStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/_5sdp"
-                android:background="@drawable/bg_un_select_rectangle"
-                android:text="Sun"
-                android:textColor="@color/sub_text" />
+<!--            <TextView-->
+<!--                android:id="@+id/txt_sun"-->
+<!--                style="@style/My_textStyle"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginRight="@dimen/_5sdp"-->
+<!--                android:background="@drawable/bg_un_select_rectangle"-->
+<!--                android:text="Sun"-->
+<!--                android:textColor="@color/sub_text" />-->
 
         </LinearLayout>
 
-    </HorizontalScrollView>
+<!--    </HorizontalScrollView>-->
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -177,7 +188,7 @@
         android:layout_marginHorizontal="@dimen/_8sdp"
         android:layout_marginTop="@dimen/_5sdp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/horizontal" />
+        app:layout_constraintTop_toBottomOf="@id/linerHor" />
 
 
     <ImageView

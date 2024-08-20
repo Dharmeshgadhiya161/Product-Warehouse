@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
+import com.sunil.dhwarehouse.roomDB.InvoiceMaster
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.FooterItemRowBinding
 import com.sunil.dhwarehouse.databinding.InvoiceOrderItemViewBinding
@@ -16,7 +16,9 @@ class InvoiceViewAdapter(
     private val context: Context,
     private val invoicesList: MutableList<InvoiceMaster>,
     private val totalItems: Int,
-    private val totalAmount: Double
+    private val totalSch: Double,
+    private val totalAmount: Double,
+    private val totalFreeQty: Int
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -26,11 +28,13 @@ class InvoiceViewAdapter(
     override fun getItemViewType(position: Int): Int {
         return if (position == invoicesList.size) ITEM_VIEW_TYPE_FOOTER else ITEM_VIEW_TYPE_ITEM
     }
+
     class InvoiceViewHolder(var binding: InvoiceOrderItemViewBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    class FooterViewHolder (var bindingFooter: FooterItemRowBinding) :
+    class FooterViewHolder(var bindingFooter: FooterItemRowBinding) :
         RecyclerView.ViewHolder(bindingFooter.root)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == ITEM_VIEW_TYPE_FOOTER) {
             val bindingFooter: FooterItemRowBinding =
@@ -40,7 +44,7 @@ class InvoiceViewAdapter(
                     false
                 )
             FooterViewHolder(bindingFooter)
-        }else {
+        } else {
             val binding: InvoiceOrderItemViewBinding =
                 InvoiceOrderItemViewBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -74,42 +78,34 @@ class InvoiceViewAdapter(
                 )
             }
 
-//            for (index in 1 until invoicesList.size) {
-//                println("Element at index $index is ${invoicesList[index]}")
-//            }
 
-
-
-            holder.binding.txtItemProductName.text =
-                invoiceMaster.productItemName
+            holder.binding.txtSno.text = invoiceMaster.no.toString()
+            holder.binding.txtItemProductName.text = invoiceMaster.productItemName
             holder.binding.txtItemProductName.setSelected(true)
+            holder.binding.txtMrp.text = invoiceMaster.mrp.toString()
             holder.binding.txtQty.text =
-                invoiceMaster.qty.toInt().toString()
+                if (invoiceMaster.qty == 0) "" else invoiceMaster.qty.toString()
             holder.binding.txtQtyFree.text =
-                invoiceMaster.free.toInt().toString()
+                if (invoiceMaster.free == 0) "" else invoiceMaster.free.toString()
             holder.binding.txtScm.text =
-                invoiceMaster.scm.toString()
-            holder.binding.txtSaleRate.text =UtilsFile().roundValues(invoiceMaster.rate).toString()
-            holder.binding.txtSubTotal.text =UtilsFile().roundValues(invoiceMaster.subTotal).toString()
-
-
-
+                if (invoiceMaster.scm == 0.0) "" else invoiceMaster.scm.toString()
+            holder.binding.txtSaleRate.text = UtilsFile().roundValues(invoiceMaster.rate).toString()
+            holder.binding.txtSubTotal.text =
+                UtilsFile().roundValues(invoiceMaster.amount).toString()
 
 
         } else if (holder is FooterViewHolder) {
 
-            holder.bindingFooter.txtTotalItem.text =totalItems.toString()
-            holder.bindingFooter.txtTotalRs.text = "${context.getString(R.string.rs)}$totalAmount"
+            holder.bindingFooter.txtTotalItemQty.text = totalItems.toString() +"     " +if(totalFreeQty == 0) "" else totalFreeQty.toString()
+//            holder.bindingFooter.txtTotalItemFreeQty.text =  if (totalFreeQty == 0) "" else totalFreeQty.toString()
+//            holder.bindingFooter.txtTotalSch.text = if (totalSch == 0.0) "" else totalSch.toString()
+            holder.bindingFooter.txtTotalRs.text =
+                if (totalAmount == 0.0) "" else "${context.getString(R.string.rs)}$totalAmount"
         }
     }
-
-//    override fun getItemCount(): Int = invoicesList.size
 
     override fun getItemCount(): Int {
         return invoicesList.size + 1 // Add 1 for the footer
     }
 
-
 }
-
-

@@ -1,13 +1,11 @@
 package com.sunil.dhwarehouse.adapter
 
 import android.app.Activity
-import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.ClickItemCategory
+import com.sunil.dhwarehouse.roomDB.ClickItemCategory
 import com.sunil.dhwarehouse.databinding.ItemCategroyRowBinding
 
 class ItemCategoryAdapter(

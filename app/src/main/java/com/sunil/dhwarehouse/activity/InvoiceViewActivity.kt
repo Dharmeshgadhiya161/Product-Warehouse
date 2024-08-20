@@ -1,8 +1,7 @@
-package com.sunil.dhwarehouse.Activity
+package com.sunil.dhwarehouse.activity
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -11,19 +10,21 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sunil.dhwarehouse.BuildConfig
 import com.sunil.dhwarehouse.MainActivity
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
-import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.roomDB.InvoiceMaster
+import com.sunil.dhwarehouse.roomDB.ItemMaster
+import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.adapter.InvoiceViewAdapter
 import com.sunil.dhwarehouse.common.UtilsFile
+import com.sunil.dhwarehouse.common.writeGroupedInvoicesToPdf
+import com.sunil.dhwarehouse.common.writeInvoicesToCsv
 import com.sunil.dhwarehouse.databinding.ActivityInvoiceViewBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +32,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.IOException
 
 class InvoiceViewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInvoiceViewBinding
@@ -44,9 +44,11 @@ class InvoiceViewActivity : AppCompatActivity() {
     private var medicalName = ""
     var date = ""
     var time = ""
+    private var timeSecond = ""
     private lateinit var invoiceListBilAct: MutableList<InvoiceMaster>
     private var isInvoiceBilActivity: Boolean = false
-
+    private lateinit var itemMasterList: MutableList<ItemMaster>
+    private lateinit var invoiceColor: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -62,7 +64,8 @@ class InvoiceViewActivity : AppCompatActivity() {
         //requestStoragePermissions()
 
         isInvoiceBilActivity = intent.getBooleanExtra("isInvoiceBilActivity", false)
-
+        itemMasterList = ArrayList()
+        qtyItemDataUpdate()
         if (isInvoiceBilActivity) {
             invoiceListBilAct = (intent.getParcelableArrayListExtra<InvoiceMaster>("invoice_list")
                 ?: emptyList()).toMutableList()
@@ -76,6 +79,7 @@ class InvoiceViewActivity : AppCompatActivity() {
             mobileNo = intent.getStringExtra("MobileNo").toString()
             date = intent.getStringExtra("Date").toString()
             time = intent.getStringExtra("Time").toString()
+            timeSecond = intent.getStringExtra("TimeSecond").toString()
 
             println("Date: $date")
             println("Time: $time")
@@ -86,19 +90,27 @@ class InvoiceViewActivity : AppCompatActivity() {
             binding.txtMedicalAddress.text = medicalAddress
             binding.txtMedicalPhone.text = mobileNo
         }
-        binding.ivShare.setOnClickListener {
+        binding.ivCSVShare.setOnClickListener {
             if (isInvoiceBilActivity) {
-                saveCsvFile(invoiceListBilAct, false, medicalName)
+                saveCsvFile(invoiceListBilAct, false, medicalName, "_invoice.csv")
             } else {
-                saveCsvFile(invoicesList, false, medicalName)
+                saveCsvFile(invoicesList, false, medicalName, "_invoice.csv")
             }
         }
 
-        binding.ivWAShare.setOnClickListener {
-            saveCsvFile(invoicesList, true, medicalName)
+        binding.ivPDFShare.setOnClickListener {
+            if (isInvoiceBilActivity) {
+                saveCsvFile(invoiceListBilAct, true, medicalName, "_invoice.pdf")
+            } else {
+                saveCsvFile(invoicesList, true, medicalName, "_invoice.pdf")
+            }
         }
 
         binding.ivBack.setOnClickListener {
+            onBackPressed()
+        }
+
+        binding.ivHome.setOnClickListener {
             onBackPressed()
         }
 
@@ -123,11 +135,21 @@ class InvoiceViewActivity : AppCompatActivity() {
                     MasterDatabase.getDatabase(this@InvoiceViewActivity).invoiceDao()
                 val invoices = fetchedInvoices.getInvoiceMaster().toMutableList()
 
+//                val fetchedInvoicesBil =
+//                    MasterDatabase.getDatabase(this@InvoiceViewActivity).invoiceBilDao()
+//                val invoicesBil = fetchedInvoicesBil.getInvoiceMaster().toMutableList()
 
                 // Filter invoices based on account_name
                 invoicesList.clear()
+                // var invoiceBil: InvoiceBilMaster
+                var sNo = 1
+                //  val invoicesToInsert = mutableListOf<InvoiceBilMaster>()
                 for (item in invoices) {
-                    if (item.account_name == medicalName && item.date == date && item.time == time) {
+                    if (item.account_name == medicalName && item.date == date && item.timeSecond == timeSecond) {
+                        item.no = sNo++
+                        GlobalScope.launch(Dispatchers.IO) {
+                            fetchedInvoices.updateItem(item)
+                        }
                         invoicesList.add(item)
                     }
                 }
@@ -136,12 +158,15 @@ class InvoiceViewActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     // Calculate totals
                     val totalItems = invoicesList.sumOf { it.qty }
-                    val totalAmount = invoicesList.sumOf { it.subTotal }
+                    val totalFreeQty = invoicesList.sumOf { it.free }
+                    val totalSch = invoicesList.sumOf { it.scm }
+                    val totalAmount = invoicesList.sumOf { it.amount }
                     invoiceViewAdapter = InvoiceViewAdapter(
                         this@InvoiceViewActivity,
                         invoicesList,
-                        totalItems.toInt(),
-                        UtilsFile().roundValues(totalAmount)
+                        totalItems,
+                        UtilsFile().roundValues(totalSch),
+                        UtilsFile().roundValues(totalAmount),totalFreeQty
                     )
                     binding.rvInvoice.layoutManager = LinearLayoutManager(this@InvoiceViewActivity)
                     binding.rvInvoice.adapter = invoiceViewAdapter
@@ -155,24 +180,28 @@ class InvoiceViewActivity : AppCompatActivity() {
 
     private fun fetchDataInvoiceBilActivity() {
         GlobalScope.launch(Dispatchers.IO) {
-            for (item in invoiceListBilAct) {
-                medicalName = item.account_name
-                binding.txtUsername.text = item.account_name
-                binding.txtDateTime.text = (item.date + " " + item.time)
-                binding.txtMedicalAddress.text = item.address
-                binding.txtMedicalPhone.text = item.mobile_no
-            }
-
             try {
                 withContext(Dispatchers.Main) {
+                    for (item in invoiceListBilAct) {
+                        medicalName = item.account_name
+                        binding.txtUsername.text = item.account_name
+                        binding.txtDateTime.text = (item.date + " " + item.time)
+                        binding.txtMedicalAddress.text = item.address
+                        binding.txtMedicalPhone.text = item.mobile_no
+                    }
+
                     // Calculate totals
-                    val totalItems = invoiceListBilAct.size
-                    val totalAmount = invoiceListBilAct.sumOf { it.subTotal }
+                    val totalItems = invoiceListBilAct.sumOf { it.qty }
+                    val totalFreeQty = invoiceListBilAct.sumOf { it.free }
+                    val totalSch = invoiceListBilAct.sumOf { it.scm }
+                    val totalAmount = invoiceListBilAct.sumOf { it.amount }
                     invoiceViewAdapter = InvoiceViewAdapter(
                         this@InvoiceViewActivity,
                         invoiceListBilAct,
                         totalItems,
-                        UtilsFile().roundValues(totalAmount)
+                        UtilsFile().roundValues(totalSch),
+                        UtilsFile().roundValues(totalAmount),
+                        totalFreeQty
                     )
                     binding.rvInvoice.layoutManager = LinearLayoutManager(this@InvoiceViewActivity)
                     binding.rvInvoice.adapter = invoiceViewAdapter
@@ -185,29 +214,40 @@ class InvoiceViewActivity : AppCompatActivity() {
 
     private fun saveCsvFile(
         invoicesList: MutableList<InvoiceMaster>,
-        isWAShare: Boolean,
-        medicalName: String
+        isPDFShare: Boolean,
+        medicalName: String,
+        fileExtension: String
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // val invoices = getInvoicesFromDatabase()
+                var isSuccess: Boolean
                 if (invoicesList.isNotEmpty()) {
-                    val filePath = getCsvFilePath(medicalName + "_invoice.csv")
-                    val isSuccess = writeInvoicesToCsv(invoicesList, filePath)
-
+                    val filePath = getCsvFilePath(medicalName + fileExtension)
+                    if(!isPDFShare){
+                         isSuccess = writeInvoicesToCsv(invoicesList, filePath)
+                    }else{
+                        // Group the invoices by the `no` (invoice number)
+                        val groupedInvoices = invoicesList.groupBy { it.no }
+                         isSuccess = writeGroupedInvoicesToPdf(
+                            this@InvoiceViewActivity,
+                            groupedInvoices,
+                            filePath,
+                            invoicesList
+                        )
+                    }
                     withContext(Dispatchers.Main) {
                         if (isSuccess) {
                             notifyMediaScanner(filePath)
                             Log.e("saveCsvFile", "saveCsvFile: $filePath")
-                            if (!isWAShare) {
+                            if (!isPDFShare) {
                                 shareFile(this@InvoiceViewActivity, filePath)
                             } else {
-                                shareFileToWhatsApp(filePath)
+                                sharePdfFile(filePath)
                             }
                         } else {
                             Toast.makeText(
                                 this@InvoiceViewActivity,
-                                "Failed to save CSV file",
+                                "Failed to save file",
                                 Toast.LENGTH_LONG
                             ).show()
                         }
@@ -290,70 +330,56 @@ class InvoiceViewActivity : AppCompatActivity() {
         context.startActivity(Intent.createChooser(intent, "Share CSV File"))
     }
 
-    private fun shareFileToWhatsApp(filePath: String) {
+
+
+//    private fun writeInvoicesToCsv(invoices: List<InvoiceMaster>, filePath: String): Boolean {
+//        return try {
+//            val file = File(filePath)
+//            file.bufferedWriter().use { out ->
+//                out.write("No,Sales Name,Account Name,Address,Mobile No,Date,Time,Product Item Name,Qty,Free,SCM,Rate,SubTotal\n")
+//                for (invoice in invoices) {
+//                    out.write(
+//                        "${invoice.no},${invoice.salesName},${invoice.account_name},${invoice.address},${invoice.mobile_no},${invoice.date},${invoice.time}," +
+//                                "${invoice.productItemName},${invoice.qty},${invoice.free},${invoice.scm},${invoice.rate}," +
+//                                "${invoice.amount}\n"
+//                    )
+//                }
+//            }
+//            true
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//            false
+//        }
+//    }
+
+    private fun sharePdfFile(filePath: String) {
         val file = File(filePath)
-        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            FileProvider.getUriForFile(this@InvoiceViewActivity, "$packageName.provider", file)
-        } else {
-            Uri.fromFile(file)
-        }
+        if (file.exists()) {
+            // Create a URI for the file using FileProvider
+            val uri: Uri = FileProvider.getUriForFile(
+                this@InvoiceViewActivity,
+                "$packageName.provider", // Replace with your package name
+                file
+            )
 
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/csv"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            setPackage("com.whatsapp")
-        }
-
-        // Check if WhatsApp is installed
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivity(intent)
-        } else {
-            Toast.makeText(this@InvoiceViewActivity, "WhatsApp not installed", Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-
-    private fun writeInvoicesToCsv(invoices: List<InvoiceMaster>, filePath: String): Boolean {
-        return try {
-            val file = File(filePath)
-            file.bufferedWriter().use { out ->
-                out.write("ID,Sales Name,Account Name,Address,Mobile No,Date,Time,Product Item Name,Qty,Free,SCM,Rate,SubTotal\n")
-                for (invoice in invoices) {
-                    out.write(
-                        "${invoice.id},${invoice.salesName},${invoice.account_name},${invoice.address},${invoice.mobile_no},${invoice.date},${invoice.time}," +
-                                "${invoice.productItemName},${invoice.qty},${invoice.free},${invoice.scm},${invoice.rate}," +
-                                "${invoice.subTotal}\n"
-                    )
-                }
+            // Create a sharing intent
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            true
-        } catch (e: IOException) {
-            e.printStackTrace()
-            false
+
+            // Start the sharing intent
+            startActivity(Intent.createChooser(shareIntent, "Share PDF using"))
+        } else {
+            // Handle the case where the file does not exist
+            Toast.makeText(this@InvoiceViewActivity, "File not found", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private suspend fun getInvoicesFromDatabase(): List<InvoiceMaster> {
-        val invoiceDao = MasterDatabase.getDatabase(this@InvoiceViewActivity).invoiceDao()
-        return invoiceDao.getInvoiceMaster() // or use any appropriate method to fetch data
-    }
 
 
-    private fun requestStoragePermissions() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_WRITE_STORAGE
-            )
-        }
-    }
+
 //    private fun deleteLastItem(invoiceListBilAct: MutableList<InvoiceMaster>) {
 //
 //
@@ -398,6 +424,28 @@ class InvoiceViewActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    private fun qtyItemDataUpdate() {
+        lifecycleScope.launch(Dispatchers.IO) {
+
+            val accountDao1 = MasterDatabase.getDatabase(this@InvoiceViewActivity).itemDao()
+            itemMasterList = accountDao1.getItemMaster().toMutableList()
+
+            withContext(Dispatchers.Main) {
+                if (itemMasterList.size > 0) {
+                    for (item in itemMasterList) {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            item.stock_qty = item.old_stockQty
+                            accountDao1.updateItem(item)
+                            //   Log.d("UpdateItem", "Updating item at index $item with stock_qty: ${item.stock_qty}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
 }
 
 

@@ -1,15 +1,14 @@
-package com.sunil.dhwarehouse.RoomDB
+package com.sunil.dhwarehouse.roomDB
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 
 @Dao
-interface SelectItemDao {
+interface ItemDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(item: ItemMaster)
 
     @Query("SELECT * FROM item_master")
@@ -18,8 +17,6 @@ interface SelectItemDao {
     @Query("DELETE FROM item_master")
     suspend fun deleteAllItems()
 
-//    @Query("DELETE FROM item_master WHERE id = :itemId")
-//    suspend fun deleteById(itemId: Int)
     @Update
     suspend fun updateItem(item: ItemMaster)
 

@@ -1,4 +1,4 @@
-package com.sunil.dhwarehouse.RoomDB
+package com.sunil.dhwarehouse.roomDB
 
 interface ClickItemCategory {
         fun onClickItemCat(categorySelect: String)

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".Activity.InvoiceViewActivity">
+    tools:context=".activity.InvoiceViewActivity">
 
     <RelativeLayout
         android:id="@+id/linerHeader"
@@ -128,12 +128,23 @@
                 style="@style/table_header"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_26sdp"
+                android:layout_column="1"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:text="NO"
+                android:textAlignment="center" />
+
+            <TextView
+                style="@style/table_header"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_26sdp"
                 android:layout_column="0"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="2.2"
+                android:layout_weight="2.1"
                 android:gravity="center"
                 android:paddingRight="@dimen/_25sdp"
-                android:text="ItemName"
+                android:text="ITEM NAME"
                 android:textAlignment="center" />
 
             <TextView
@@ -142,10 +153,23 @@
                 android:layout_height="@dimen/_26sdp"
                 android:layout_column="1"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.7"
+                android:layout_weight="0.6"
                 android:gravity="center"
-                android:text="Qty"
+                android:text="MRP"
                 android:textAlignment="center" />
+
+            <TextView
+                style="@style/table_header"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_26sdp"
+                android:layout_column="1"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.6"
+                android:gravity="center"
+                android:text="QTY"
+                android:textAlignment="center" />
+
+
 
 
             <TextView
@@ -154,9 +178,9 @@
                 android:layout_height="@dimen/_26sdp"
                 android:layout_column="1"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="0.7"
+                android:layout_weight="0.6"
                 android:gravity="center"
-                android:text="Free"
+                android:text="FREE"
                 android:textAlignment="center" />
 
 
@@ -168,7 +192,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="0.8"
                 android:gravity="center"
-                android:text="Scm(%)"
+                android:text="SCH%"
                 android:textAlignment="center" />
 
 
@@ -180,7 +204,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Rate"
+                android:text="RATE"
                 android:textAlignment="center" />
 
 
@@ -192,7 +216,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="SubTotal"
+                android:text="AMOUNT"
                 android:textAlignment="center" />
         </TableRow>
     </TableLayout>
@@ -235,18 +259,25 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
-            android:id="@+id/ivShare"
-            android:layout_width="@dimen/_24sdp"
-            android:layout_height="@dimen/_24sdp"
+            android:id="@+id/ivPDFShare"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="@dimen/_26sdp"
             android:layout_weight="1"
-            android:src="@drawable/iv_share" />
+            android:src="@drawable/iv_pdf_file" />
 
         <ImageView
-            android:id="@+id/ivWAShare"
-            android:layout_width="@dimen/_22sdp"
-            android:layout_height="@dimen/_22sdp"
+            android:id="@+id/ivHome"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="@dimen/_26sdp"
             android:layout_weight="1"
-            android:src="@drawable/iv_share_whatsapp" />
+            android:src="@drawable/iv_home_page" />
+
+        <ImageView
+            android:id="@+id/ivCSVShare"
+            android:layout_width="@dimen/_26sdp"
+            android:layout_height="@dimen/_26sdp"
+            android:layout_weight="1"
+            android:src="@drawable/iv_csv_file" />
 
 
     </LinearLayout>

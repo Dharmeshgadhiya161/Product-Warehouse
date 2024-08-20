@@ -14,6 +14,13 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/txtSno"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="0.4"
+            android:textAlignment="center" />
+
+        <TextView
             android:id="@+id/txtItemProductName"
             style="@style/table_row_item"
             android:layout_width="0dp"
@@ -26,24 +33,31 @@
             android:textAlignment="textStart" />
 
         <TextView
+            android:id="@+id/txtMrp"
+            style="@style/table_row_item"
+            android:layout_width="0dp"
+            android:layout_weight="0.6"
+            android:textAlignment="center" />
+
+        <TextView
             android:id="@+id/txtQty"
             style="@style/table_row_item"
             android:layout_width="0dp"
-            android:layout_weight="0.7"
+            android:layout_weight="0.6"
             android:textAlignment="center" />
 
         <TextView
             android:id="@+id/txtQtyFree"
             style="@style/table_row_item"
             android:layout_width="0dp"
-            android:layout_weight="0.7"
+            android:layout_weight="0.6"
             android:textAlignment="center" />
 
         <TextView
             android:id="@+id/txtScm"
             style="@style/table_row_item"
             android:layout_width="0dp"
-            android:layout_weight="0.8"
+            android:layout_weight="0.7"
             android:textAlignment="center" />
 
 

@@ -1,4 +1,4 @@
-package com.sunil.dhwarehouse.Activity
+package com.sunil.dhwarehouse.activity
 
 import android.app.Activity
 import android.graphics.Color
@@ -14,15 +14,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sunil.dhwarehouse.R
 import com.sunil.dhwarehouse.adapter.ReviewOderItemAdapter
-import com.sunil.dhwarehouse.RoomDB.ItemDao
-import com.sunil.dhwarehouse.RoomDB.ItemMaster
-import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.roomDB.ItemDao
+import com.sunil.dhwarehouse.roomDB.ItemMaster
+import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.common.ShowingDialog
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityReviewOderItemBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -80,7 +78,12 @@ class ReviewOderItemActivity : AppCompatActivity() {
                             invoiceDao,
                             binding.txtSubtotalRS,
                             binding.txtTotalItem,
-                            binding.btnClickRequestOrder,getUserName,medicalName,medicalAddress,mobileNo,showingDialog
+                            binding.btnClickRequestOrder,
+                            getUserName,
+                            medicalName,
+                            medicalAddress,
+                            mobileNo,
+                            showingDialog
                         )
                     binding.rvReviewOrderAccount.layoutManager =
                         LinearLayoutManager(this@ReviewOderItemActivity)
@@ -104,6 +107,7 @@ class ReviewOderItemActivity : AppCompatActivity() {
 
 
     }
+
     private fun setProgressShowDialog(context: Activity, msg: String) {
         showingDialog = ShowingDialog(context, msg)
         showingDialog.setCanceledOnTouchOutside(false)
@@ -113,15 +117,6 @@ class ReviewOderItemActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         UtilsFile.isChangeValues = true
-
-        if (selectItemList.size > 0) {
-            for (item in selectItemList) {
-                GlobalScope.launch(Dispatchers.IO) {
-                    item.stock_qty = item.old_stockQty
-                    itemDao.updateItem(item)
-                }
-            }
-        }
 
     }
 

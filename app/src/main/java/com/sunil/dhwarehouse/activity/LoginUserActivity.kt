@@ -1,4 +1,4 @@
-package com.sunil.dhwarehouse.Activity
+package com.sunil.dhwarehouse.activity
 
 import android.app.Activity
 import android.app.Dialog
@@ -7,10 +7,9 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.WindowManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -23,8 +22,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.sunil.dhwarehouse.MainActivity
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.AccountMaster
-import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.roomDB.AccountMaster
+import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.common.DialogUtil
 import com.sunil.dhwarehouse.common.ExcelFileHandler
 import com.sunil.dhwarehouse.common.NetworkUtil
@@ -49,10 +48,13 @@ class LoginUserActivity : AppCompatActivity() {
     var fileType: Int = 0
     private lateinit var aryAccount1: MutableList<AccountMaster>
     lateinit var dialog: Dialog
-    lateinit var showingDialog: ShowingDialog
+    private lateinit var showingDialog: ShowingDialog
     private lateinit var storageReference: StorageReference
     private lateinit var deleteLocalFile: File
     var TAG = "LoginUserActivity"
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginUserBinding.inflate(layoutInflater)
@@ -80,9 +82,9 @@ class LoginUserActivity : AppCompatActivity() {
                     binding.filledTextField.editText?.getText().toString()
 
                 if (!sharedPrefManager.isExcelFileShowing) {
-
                     if (checkPermission()) {
                         if (NetworkUtil.isInternetAvailable(this)) {
+                            showDialog(this)
                             downloadAccountMasterFile()
                         } else {
                             DialogUtil.showNoInternetDialog(this)
@@ -98,20 +100,52 @@ class LoginUserActivity : AppCompatActivity() {
     }
 
     /*====Excel File Code=========*/
-    private fun checkPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
+//    private fun checkPermission(): Boolean {
+//        return ContextCompat.checkSelfPermission(
+//            this,
+//            android.Manifest.permission.READ_EXTERNAL_STORAGE
+//        ) == PackageManager.PERMISSION_GRANTED
+//    }
+//
+//    private fun requestPermission() {
+//        ActivityCompat.requestPermissions(
+//            this,
+//            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), storage_permission_code
+//        )
+//    }
     private fun requestPermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), storage_permission_code
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.READ_MEDIA_IMAGES
+                ),
+                storage_permission_code
+            )
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                storage_permission_code
+            )
+        }
     }
-
+//
+//
+    private fun checkPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.READ_MEDIA_IMAGES
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+//
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>, grantResults: IntArray
@@ -133,12 +167,13 @@ class LoginUserActivity : AppCompatActivity() {
 
     private fun downloadAccountMasterFile() {
         val fileReference = storageReference.child(fileExcelAccount)
-        val localFile = UtilsFile().getLocalFilePath(this,localSaveAccountFileName)
+        val localFile =
+            UtilsFile().getLocalFilePath(this@LoginUserActivity, localSaveAccountFileName)
         Log.d(TAG, "Starting download from: ${fileReference.path}")
 
         fileReference.getFile(localFile).addOnSuccessListener {
             Log.d(TAG, "File downloaded successfully: ${localFile.absolutePath}")
-            showDialog(this)
+
             // Check if the file is not empty
             if (localFile.length() == 0L) {
                 Log.e(TAG, "Downloaded file is empty.")
@@ -147,7 +182,10 @@ class LoginUserActivity : AppCompatActivity() {
             val uri = Uri.fromFile(localFile)
 
             CoroutineScope(Dispatchers.IO).launch {
-                val data = ExcelFileHandler(this@LoginUserActivity, sharedPrefManager).readExcelAccountMasterFile(uri)
+                val data = ExcelFileHandler(
+                    this@LoginUserActivity,
+                    sharedPrefManager
+                ).readExcelAccountMasterFile(uri)
                 Log.e(TAG, "reading Excel file{${data.size}}")
                 if (data.size != 0) {
 
@@ -164,7 +202,7 @@ class LoginUserActivity : AppCompatActivity() {
                         TAG, "Account Master come to add aryAccount1 : " + aryAccount1.size
                     )
                     sharedPrefManager.isAccountExcelRead = true
-                    dismissDialog(this@LoginUserActivity)
+                    //dismissDialog(this@LoginUserActivity)
                     lifecycleScope.launch(Dispatchers.IO) {
                         Thread.sleep(200)
                         downloadItemMasterFile()
@@ -196,18 +234,20 @@ class LoginUserActivity : AppCompatActivity() {
             Log.e(TAG, "Error downloading file", exception)
             Toast.makeText(this, "Does not have permission downloading file", Toast.LENGTH_SHORT)
                 .show()
+
+
         }
     }
 
 
     private fun downloadItemMasterFile() {
         val fileReference = storageReference.child(fileExcelItem)
-        val localFile = UtilsFile().getLocalFilePath(this,localSaveItemFileName)
+        val localFile = UtilsFile().getLocalFilePath(this, localSaveItemFileName)
         Log.d(TAG, "Starting download from: ${fileReference.path}")
 
         fileReference.getFile(localFile).addOnSuccessListener {
             Log.d(TAG, "File downloaded successfully: ${localFile.absolutePath}")
-            showDialog(this)
+//            showDialog(this)
             // Check if the file is not empty
             if (localFile.length() == 0L) {
                 Log.e(TAG, "Downloaded file is empty.")
@@ -245,47 +285,50 @@ class LoginUserActivity : AppCompatActivity() {
 
         }.addOnFailureListener { exception ->
             Log.e(TAG, "Error downloading file", exception)
+            Toast.makeText(this, "Does not have Item File Name Not Match", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
 
-    private fun showAddExcelFileDialog(dialog: Dialog) {
-
-        dialog.setContentView(R.layout.dialog_add_excel_show)
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT
-        )
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setCancelable(false)
-        dialog.show()
-
-        dialog.findViewById<TextView>(R.id.btnAccountExcel).setOnClickListener {
-            fileType = 1
-            if (checkPermission()) {
-                if (NetworkUtil.isInternetAvailable(this)) {
-                    downloadAccountMasterFile()
-                } else {
-                    DialogUtil.showNoInternetDialog(this)
-                }
-            } else {
-                requestPermission()
-            }
-        }
-        dialog.findViewById<TextView>(R.id.btnItemExcel).setOnClickListener {
-            fileType = 2
-            if (checkPermission()) {
-                downloadItemMasterFile()
-            } else {
-                requestPermission()
-            }
-        }
-
-    }
+//    private fun showAddExcelFileDialog(dialog: Dialog) {
+//
+//        dialog.setContentView(R.layout.dialog_add_excel_show)
+//        dialog.window?.setLayout(
+//            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT
+//        )
+//        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//        dialog.setCanceledOnTouchOutside(false)
+//        dialog.setCancelable(false)
+//        dialog.show()
+//
+//        dialog.findViewById<TextView>(R.id.btnAccountExcel).setOnClickListener {
+//            fileType = 1
+//            if (checkPermission()) {
+//                if (NetworkUtil.isInternetAvailable(this)) {
+//                    downloadAccountMasterFile()
+//                } else {
+//                    DialogUtil.showNoInternetDialog(this)
+//                }
+//            } else {
+//                requestPermission()
+//            }
+//        }
+//        dialog.findViewById<TextView>(R.id.btnItemExcel).setOnClickListener {
+//            fileType = 2
+//            if (checkPermission()) {
+//                downloadItemMasterFile()
+//            } else {
+//                requestPermission()
+//            }
+//        }
+//
+//    }
 
     private fun setProgressShowDialog(context: Activity, string: String) {
         showingDialog = ShowingDialog(context, string)
         showingDialog.setCanceledOnTouchOutside(false)
+        showingDialog.setCancelable(false)
         showingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
@@ -305,10 +348,6 @@ class LoginUserActivity : AppCompatActivity() {
         super.onDestroy()
         dismissDialog(this)
     }
-
-
-
-
 
 
 }

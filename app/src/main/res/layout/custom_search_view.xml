@@ -11,17 +11,17 @@
         android:id="@+id/search_icon"
         android:layout_width="22dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/iv_search_icon"
         android:padding="@dimen/_2sdp"
+        android:src="@drawable/iv_search_icon"
         app:tint="@color/sub_text" />
 
-<!--    <ImageView-->
-<!--        android:id="@+id/search_back"-->
-<!--        android:layout_width="22dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:src="@drawable/iv_search_icon"-->
-<!--        android:padding="@dimen/_3sdp"-->
-<!--        app:tint="@color/sub_text" />-->
+    <!--    <ImageView-->
+    <!--        android:id="@+id/search_back"-->
+    <!--        android:layout_width="22dp"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:src="@drawable/iv_search_icon"-->
+    <!--        android:padding="@dimen/_3sdp"-->
+    <!--        app:tint="@color/sub_text" />-->
 
     <androidx.appcompat.widget.AppCompatEditText
         android:id="@+id/search_edit_text"
@@ -34,18 +34,17 @@
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:paddingStart="8dp"
-        android:textSize="15sp"
         android:textColor="@android:color/black"
-        android:textColorHint="@color/sub_text" />
+        android:textColorHint="@color/sub_text"
+        android:textSize="15sp" />
 
     <ImageView
         android:id="@+id/clear_search"
-        android:layout_width="22dp"
+        android:layout_width="26dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="@dimen/_2sdp"
         android:src="@drawable/baseline_close_24"
         android:visibility="gone"
-        app:tint="@color/black"
-        android:padding="@dimen/_2sdp"
-        android:layout_gravity="center"
-        />
+        app:tint="@color/black" />
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,4 +1,4 @@
-package com.sunil.dhwarehouse.RoomDB
+package com.sunil.dhwarehouse.roomDB
 
 data class GroupedInvoice(
     val accountName: String,

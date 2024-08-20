@@ -12,10 +12,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.Window
 import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,13 +21,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.inappmessaging.FirebaseInAppMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.sunil.dhwarehouse.Activity.InvoiceBilActivity
-import com.sunil.dhwarehouse.Activity.LoginUserActivity
-import com.sunil.dhwarehouse.RoomDB.AccountMaster
-import com.sunil.dhwarehouse.RoomDB.ItemMaster
-import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.activity.InvoiceBilActivity
+import com.sunil.dhwarehouse.activity.LoginUserActivity
+import com.sunil.dhwarehouse.roomDB.AccountMaster
+import com.sunil.dhwarehouse.roomDB.ItemMaster
+import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.adapter.AccountDataAdapter
 import com.sunil.dhwarehouse.common.DialogUtil
 import com.sunil.dhwarehouse.common.ExcelFileHandler
@@ -40,13 +38,14 @@ import com.sunil.dhwarehouse.common.ShowingDialog
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityMainBinding
 import com.sunil.dhwarehouse.databinding.DialogChangeExcelBinding
-import com.sunil.dhwarehouse.databinding.DialogDeleteItemBinding
 import com.sunil.dhwarehouse.databinding.DialogLogoutAccountBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class MainActivity : AppCompatActivity() {
 
@@ -63,8 +62,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var dialogLogOut: Dialog
     private lateinit var storageReference: StorageReference
     private var getUserName = ""
-
-
+    private var isTabSelect: Boolean = false
+    private var backPressedTime: Long = 0
     var TAG = "MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,12 +89,24 @@ class MainActivity : AppCompatActivity() {
         aryNewListAccount = ArrayList()
         filteredListMain = ArrayList()
         itemMasterList = ArrayList()
-        setDataLoad("All")
+
+
+        val dayOfWeek = UtilsFile().formatDayOfWeek()
+        Log.i(TAG, "onCreate: $dayOfWeek")
+        setDataLoad(dayOfWeek)
         itemDataListClear()
         setTabSelect()
 
         binding.txtUsername.text = getUserName
 
+        val inAppMessaging = FirebaseInAppMessaging.getInstance()
+        inAppMessaging.addClickListener { inAppMessage, action ->
+            // Determine which URL the user clicked
+            val url = action.actionUrl
+            // Get general information about the campaign
+            val metadata = inAppMessage.campaignMetadata
+            Log.e(TAG, "onCreate: $metadata")
+        }
 
         binding.searchView.setOnQueryTextListener { query ->
             filterAccounts(query)
@@ -124,8 +135,8 @@ class MainActivity : AppCompatActivity() {
             binding.txtWed to "WEDNESDAY",
             binding.txtThu to "THURSDAY",
             binding.txtFri to "FRIDAY",
-            binding.txtSat to "SATURDAY",
-            binding.txtSun to "SUNDAY"
+            binding.txtSat to "SATURDAY"
+            //  binding.txtSun to "SUNDAY"
         )
 
         for ((textView, day) in days) {
@@ -137,43 +148,51 @@ class MainActivity : AppCompatActivity() {
                 textView.setTextColor(ContextCompat.getColor(this, R.color.sub_text))
             }
         }
-
-        setDataLoad(selectedDay)
+        if (isTabSelect) {
+            setDataLoad(selectedDay)
+        }
     }
 
 
     private fun setTabSelect() {
         binding.txtAll.setOnClickListener {
+            isTabSelect = true
             updateSelection("All")
         }
 
         binding.txtMon.setOnClickListener {
+            isTabSelect = true
             updateSelection("MONDAY")
         }
 
         binding.txtTue.setOnClickListener {
+            isTabSelect = true
             updateSelection("TUESDAY")
         }
 
         binding.txtWed.setOnClickListener {
+            isTabSelect = true
             updateSelection("WEDNESDAY")
         }
 
         binding.txtThu.setOnClickListener {
+            isTabSelect = true
             updateSelection("THURSDAY")
         }
 
         binding.txtFri.setOnClickListener {
+            isTabSelect = true
             updateSelection("FRIDAY")
         }
 
         binding.txtSat.setOnClickListener {
+            isTabSelect = true
             updateSelection("SATURDAY")
         }
 
-        binding.txtSun.setOnClickListener {
-            updateSelection("SUNDAY")
-        }
+//        binding.txtSun.setOnClickListener {
+//            updateSelection("SUNDAY")
+//        }
     }
 
 
@@ -207,6 +226,9 @@ class MainActivity : AppCompatActivity() {
 
             withContext(Dispatchers.Main) {
                 if (dayWiseAryAccount1.size != 0) {
+                    if (!isTabSelect) {
+                        updateSelection(dayName)
+                    }
                     binding.rvAllAccount.visibility = View.VISIBLE
                     binding.layoutNoData.constNoDataLay.visibility = View.GONE
                     accountDataAdapter =
@@ -239,7 +261,6 @@ class MainActivity : AppCompatActivity() {
                             item.edtxt_scm = 0.0
                             item.txt_net_rate = 0.0
                             item.txt_subTotal = 0.0
-                            item.stock_qty = item.old_stockQty
                             item.margin = item.old_margin
                             accountDao1.updateItem(item)
                         }
@@ -253,6 +274,7 @@ class MainActivity : AppCompatActivity() {
     private fun setProgressShowDialog(context: Activity, msg: String) {
         showingDialog = ShowingDialog(context, msg)
         showingDialog.setCanceledOnTouchOutside(false)
+        showingDialog.setCancelable(false)
         showingDialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
@@ -272,10 +294,11 @@ class MainActivity : AppCompatActivity() {
         binding.ivClose.setOnClickListener {
             dialog.dismiss()
         }
+
         binding.btnAccountExcel.setOnClickListener {
             if (NetworkUtil.isInternetAvailable(this)) {
                 binding.btnAccountExcel.isEnabled = false
-
+                showingDialog.show()
                 downloadAccountMasterFile()
             } else {
                 DialogUtil.showNoInternetDialog(this)
@@ -285,6 +308,12 @@ class MainActivity : AppCompatActivity() {
         binding.btnItemExcel.setOnClickListener {
             if (NetworkUtil.isInternetAvailable(this)) {
                 binding.btnItemExcel.isEnabled = false
+
+                if (dialog.isShowing) {
+                    dialog.dismiss()
+                }
+                showingDialog.show()
+
                 downloadItemMasterFile()
             } else {
                 DialogUtil.showNoInternetDialog(this)
@@ -341,7 +370,6 @@ class MainActivity : AppCompatActivity() {
         dialog.dismiss()
     }
 
-
     private fun downloadAccountMasterFile() {
         val fileReference = storageReference.child(UtilsFile.fileExcelAccount)
         val localFile = UtilsFile().getLocalFilePath(this, UtilsFile.localSaveAccountFileName)
@@ -349,9 +377,6 @@ class MainActivity : AppCompatActivity() {
 
         fileReference.getFile(localFile).addOnSuccessListener {
             Log.d(TAG, "File downloaded successfully: ${localFile.absolutePath}")
-
-            showingDialog.show()
-
             if (localFile.length() == 0L) {
                 Log.e(TAG, "Downloaded file is empty.")
                 return@addOnSuccessListener
@@ -384,7 +409,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     lifecycleScope.launch(Dispatchers.IO) {
                         Thread.sleep(300)
-                        setDataLoad("All")
+                        val dayOfWeek = UtilsFile().formatDayOfWeek()
+                        Log.i(TAG, "downloadAccountMasterFile: $dayOfWeek")
+                        setDataLoad(dayOfWeek)
+                        //setDataLoad("All")
                         UtilsFile().deleteLocalFile(localFile, UtilsFile.localSaveAccountFileName)
                     }
 
@@ -405,10 +433,7 @@ class MainActivity : AppCompatActivity() {
 
         fileReference.getFile(localFile).addOnSuccessListener {
             Log.d(TAG, "File downloaded successfully: ${localFile.absolutePath}")
-            if (dialog.isShowing) {
-                dialog.dismiss()
-            }
-            showingDialog.show()
+
             // Check if the file is not empty
             if (localFile.length() == 0L) {
                 Log.e(TAG, "Downloaded file is empty.")
@@ -442,12 +467,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var toast: Toast
     override fun onBackPressed() {
-        super.onBackPressed()
-        if (UtilsFile.isFinishInvoice) {
-            finishAffinity()
+
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            if (UtilsFile.isFinishInvoice) {
+                finishAffinity()
+            } else {
+                finishAffinity()
+            }
+            toast.cancel()
+            super.onBackPressed()
+            return
         } else {
-            finishAffinity()
+            toast = Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT)
+            toast.show()
         }
+        backPressedTime = System.currentTimeMillis()
+
+
     }
 }

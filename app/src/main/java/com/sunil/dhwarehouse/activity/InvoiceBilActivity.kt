@@ -1,4 +1,4 @@
-package com.sunil.dhwarehouse.Activity
+package com.sunil.dhwarehouse.activity
 
 import android.os.Bundle
 import android.util.Log
@@ -11,17 +11,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.GroupedInvoice
-import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
-import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.roomDB.GroupedInvoice
+import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.adapter.GroupedInvoiceAdapter
-import com.sunil.dhwarehouse.adapter.InvoiceBilAdapter
-import com.sunil.dhwarehouse.adapter.InvoiceViewAdapter
-import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ActivityInvoiceBilBinding
-import com.sunil.dhwarehouse.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -106,10 +100,8 @@ class InvoiceBilActivity : AppCompatActivity() {
             try {
                 val database = MasterDatabase.getDatabase(this@InvoiceBilActivity)
                 val invoiceToDelete = groupedInvoiceList[position]
-                // Assuming you have a method to delete from the database
                 database.invoiceDao().deleteInvoices(invoiceToDelete.invoices)
 
-                // Update the local list and notify the adapter
                 withContext(Dispatchers.Main) {
                     invoiceBilAdapter.removeItem(position)
 

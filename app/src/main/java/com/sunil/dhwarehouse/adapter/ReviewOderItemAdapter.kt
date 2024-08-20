@@ -13,12 +13,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.sunil.dhwarehouse.Activity.InvoiceViewActivity
+import com.sunil.dhwarehouse.activity.InvoiceViewActivity
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.InvoiceDao
-import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
-import com.sunil.dhwarehouse.RoomDB.ItemDao
-import com.sunil.dhwarehouse.RoomDB.ItemMaster
+import com.sunil.dhwarehouse.roomDB.InvoiceDao
+import com.sunil.dhwarehouse.roomDB.InvoiceMaster
+import com.sunil.dhwarehouse.roomDB.ItemDao
+import com.sunil.dhwarehouse.roomDB.ItemMaster
 import com.sunil.dhwarehouse.common.ShowingDialog
 import com.sunil.dhwarehouse.common.ToastUtils
 import com.sunil.dhwarehouse.common.UtilsFile
@@ -30,9 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
 
 class ReviewOderItemAdapter(
     var context: Activity,
@@ -94,11 +91,9 @@ class ReviewOderItemAdapter(
             )
         }
 
-
         holder.binding.txtItemProductName.text =
             itemMaster.item_name
         holder.binding.txtItemProductName.setSelected(true)
-
 
         holder.binding.txtProductMRP.text =
             "${context.getString(R.string.rs)}" + itemMaster.mrp.toString()
@@ -150,7 +145,7 @@ class ReviewOderItemAdapter(
 
             if (itemMasterList[holder.adapterPosition].edtxt_scm.toInt() != 0) {
                 holder.binding.edtAddScm.setText(
-                    itemMasterList[holder.adapterPosition].edtxt_scm.toInt().toString()
+                    itemMasterList[holder.adapterPosition].edtxt_scm.toString()
                 )
             } else {
                 holder.binding.edtAddScm.setText("")
@@ -177,10 +172,8 @@ class ReviewOderItemAdapter(
             holder.binding.edtAddScm.enabled()
         }
 
-
         holder.binding.txtProductSubTotal.text =
             "${context.getString(R.string.rs)}" + itemMasterList[holder.adapterPosition].txt_subTotal.toString()
-
 
         holder.binding.ivClearProduct.setOnClickListener {
             holder.binding.txtTotalQty.text = itemMaster.stock_qty.toString()
@@ -221,14 +214,13 @@ class ReviewOderItemAdapter(
             val (date, time) = UtilsFile().getFormattedDateTime()
             println("Date: $date")
             println("Time: $time")
+            val formattedTimeSecond = UtilsFile().getFormattedTimeSecond()
+
             var invoice: InvoiceMaster
             // Use a list to batch insert invoices if needed
             val invoicesToInsert = mutableListOf<InvoiceMaster>()
             for (item in selectItemList) {
-//                edtQtyNumber = holder.binding.txtTotalQty.text.toString()
-                GlobalScope.launch(Dispatchers.IO) {
-                  //  accountDao.updateItem(item = itemMaster.copy(stock_qty = itemMasterList[position].old_stockQty))
-                }
+
 
                 invoice = InvoiceMaster(
                     salesName = getUserName,
@@ -237,12 +229,14 @@ class ReviewOderItemAdapter(
                     mobile_no = mobileNo,
                     date = date,
                     time = time,
+                    timeSecond=formattedTimeSecond,
                     productItemName = item.item_name,
-                    qty = item.edtxt_qty,
-                    free = item.edtxt_free,
+                    mrp = item.mrp,
+                    qty = item.edtxt_qty.toInt(),
+                    free = item.edtxt_free.toInt(),
                     scm = item.edtxt_scm,
                     rate = item.txt_net_rate,
-                    subTotal = item.txt_subTotal
+                    amount = item.txt_subTotal
                 )
                 invoicesToInsert.add(invoice)
             }
@@ -260,11 +254,12 @@ class ReviewOderItemAdapter(
                         intent.putExtra("MobileNo", mobileNo)
                         intent.putExtra("Date", date)
                         intent.putExtra("Time", time)
+                        intent.putExtra("TimeSecond", formattedTimeSecond)
                         context.startActivity(intent)
                         if (showingDialog.isShowing) {
                             showingDialog.dismiss()
                         }
-                        (context as Activity).finish()
+                        context.finish()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Error inserting invoices: ${e.message}")
@@ -358,7 +353,7 @@ class ReviewOderItemAdapter(
                         //  freeQty = itemMaster.stock_qty - itemMaster.edtxt_free - input.toDouble()
                         binding.txtTotalQty.text = freeQty.toString()
                         Log.e(TAG, "onTextChanged freeQtyQty NetSaleRate:<freeQty> $freeQty")
-                    //    itemMasterList[position].old_stockQty = freeQty
+                        itemMasterList[position].old_stockQty = freeQty
                         updateQtyItem(input)
                     } else {
                         ToastUtils.showCustomToast(
@@ -381,7 +376,7 @@ class ReviewOderItemAdapter(
                     qtyTotalStock = itemMaster.stock_qty - itemMasterList[position].edtxt_qty
                     binding.txtTotalQty.text = qtyTotalStock.toString()
 
-                  //  itemMasterList[position].old_stockQty = qtyTotalStock
+                    itemMasterList[position].old_stockQty = qtyTotalStock
 
                     saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
                     scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
@@ -414,7 +409,7 @@ class ReviewOderItemAdapter(
                         qtyTotalStock = itemMaster.stock_qty - itemMasterList[position].edtxt_qty
                         binding.txtTotalQty.text = qtyTotalStock.toString()
 
-                      //  itemMasterList[position].old_stockQty = qtyTotalStock
+                        itemMasterList[position].old_stockQty = qtyTotalStock
 
                         updateQtyItem(input)
                     } else {
@@ -560,7 +555,7 @@ class ReviewOderItemAdapter(
                 if (qtyMinus >= input.toDouble()) {
                     freeQty = qtyMinus - input.toDouble()
                     binding.txtTotalQty.text = freeQty.toInt().toString()
-                   // itemMasterList[position].old_stockQty = freeQty
+                    itemMasterList[position].old_stockQty = freeQty
                     binding.edtAddScm.disable()
 
                     GlobalScope.launch(Dispatchers.IO) {
@@ -588,7 +583,7 @@ class ReviewOderItemAdapter(
                         .toString()
                     itemMasterList[position].edtxt_free = 0.0
 
-                  //  itemMasterList[position].old_stockQty = qtyTotalStock
+                    itemMasterList[position].old_stockQty = qtyTotalStock
                 } else {
                     binding.txtTotalQty.text = itemMaster.stock_qty.toString()
                     itemMasterList[position].edtxt_free = 0.0

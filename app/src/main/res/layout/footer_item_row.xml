@@ -17,26 +17,37 @@
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_26sdp"
+                android:layout_column="1"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.5"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_26sdp"
                 android:layout_column="0"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
+                android:layout_weight="1.2"
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:paddingRight="@dimen/_3sdp"
-                android:text="Total Items"
+                android:text="TOTAL"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="14sp" />
 
-                />
 
             <TextView
-                android:id="@+id/txtTotalItem"
+                android:id="@+id/txtTotalItemQty"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_26sdp"
                 android:layout_column="1"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
+                android:layout_weight="0.8"
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:singleLine="true"
@@ -45,14 +56,30 @@
                 android:textSize="15sp" />
 
             <TextView
+                android:id="@+id/txtTotalItemFreeQty"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_26sdp"
                 android:layout_column="1"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
+                android:layout_weight="0.2"
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
-                android:text="Total Rs"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+
+            <TextView
+                android:id="@+id/txtTotalSch"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_26sdp"
+                android:layout_column="1"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.4"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="center"
+                android:visibility="visible"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
@@ -64,7 +91,7 @@
                 android:layout_height="@dimen/_26sdp"
                 android:layout_column="1"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
+                android:layout_weight="0.9"
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:singleLine="true"

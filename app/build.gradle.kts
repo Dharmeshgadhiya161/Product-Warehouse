@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 //plugins {
 ////    alias(libs.plugins.android.application)
 ////    alias(libs.plugins.jetbrains.kotlin.android)
@@ -27,6 +30,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        var timestamp = SimpleDateFormat("MM-dd-yyyy_hh-mm").format(Date())
+        setProperty("archivesBaseName", "MAHADEVDISTRIBUTOR_v$versionCode$timestamp")
     }
 
     buildTypes {
@@ -80,6 +86,9 @@ dependencies {
     implementation ("com.intuit.sdp:sdp-android:1.1.1")
     implementation ("com.airbnb.android:lottie:6.4.1")
 
+    implementation ("com.itextpdf:itext7-core:7.1.16")
+//    implementation ("com.itextpdf:itextg:5.5.10")
+
     // Import the BoM for the Firebase platform
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     // Add the dependency for the Cloud Storage library
@@ -89,4 +98,8 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-core:21.1.1")
+
+    // Firebase In-App Messaging
+    implementation ("com.google.firebase:firebase-inappmessaging-display:20.2.0")
 }

@@ -1,24 +1,25 @@
-package com.sunil.dhwarehouse.Activity
+package com.sunil.dhwarehouse.activity
 
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.inappmessaging.FirebaseInAppMessaging
 import com.sunil.dhwarehouse.MainActivity
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.ItemMaster
-import com.sunil.dhwarehouse.RoomDB.MasterDatabase
+import com.sunil.dhwarehouse.roomDB.ItemMaster
+import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.common.SharedPrefManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var sharedPrefManager: SharedPrefManager
@@ -60,7 +61,6 @@ class SplashActivity : AppCompatActivity() {
                                 item.edtxt_scm = 0.0
                                 item.txt_net_rate = 0.0
                                 item.txt_subTotal = 0.0
-                                item.stock_qty = item.old_stockQty
                                 item.margin = item.old_margin
                                 accountDao.updateItem(item)
 

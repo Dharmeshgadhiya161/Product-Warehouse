@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".Activity.ItemProductActivity">
+    android:fitsSystemWindows="true"
+    tools:context=".activity.ItemProductActivity">
 
     <LinearLayout
         android:id="@+id/linerHeader"
@@ -79,9 +80,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:fontFamily="@font/roboto_medium"
+                    android:gravity="center"
                     android:padding="@dimen/_6sdp"
                     android:text=" ALL "
-                    android:gravity="center"
                     android:textColor="@color/white"
                     android:textSize="13sp" />
 
@@ -91,8 +92,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvItemCategory"
                 android:layout_width="match_parent"
-                tools:listitem="@layout/item_categroy_row"
-                android:layout_height="50dp" />
+                android:layout_height="50dp"
+                tools:listitem="@layout/item_categroy_row" />
 
         </LinearLayout>
 

@@ -12,6 +12,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class UtilsFile {
@@ -20,11 +21,11 @@ class UtilsFile {
 
         const val fileExcelAccount = "account master.xlsx"
         const val localSaveAccountFileName = "account_master.xlsx"
-        const val fileExcelItem = "stock leger  margine.xlsx"
+        const val fileExcelItem = "stock leger margine.xlsx"
         const val localSaveItemFileName = "stock_leger_margine.xlsx"
 
         private const val TAG = "Utils"
-
+        var isQtyBack: Boolean = false
         var isChangeValues: Boolean = false
         var isFinishInvoice: Boolean = false
         var isFinishInvoiceBil: Boolean = false
@@ -35,7 +36,7 @@ class UtilsFile {
         return BigDecimal(roundValue).setScale(2, RoundingMode.HALF_UP).toDouble()
     }
 
-    public fun getLocalFilePath(context: Context, fileName: String): File {
+    fun getLocalFilePath(context: Context, fileName: String): File {
         val directory = File(context.filesDir, "my_excel_files")//folderName
         if (!directory.exists()) {
             directory.mkdirs()
@@ -75,5 +76,14 @@ class UtilsFile {
     }
 
 
+    fun getFormattedTimeSecond(): String {
+        val timeFormat = SimpleDateFormat("hh:mm:ss.SSS a")
+        val date = Date()
+        return timeFormat.format(date)
+    }
 
+    fun formatDayOfWeek(): String {
+        val dayOfWeekFormat = SimpleDateFormat("EEEE")
+        return dayOfWeekFormat.format(Date()).uppercase()
+    }
 }

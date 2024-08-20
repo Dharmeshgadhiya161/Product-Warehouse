@@ -8,12 +8,10 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.sunil.dhwarehouse.Activity.InvoiceViewActivity
+import com.sunil.dhwarehouse.activity.InvoiceViewActivity
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.GroupedInvoice
+import com.sunil.dhwarehouse.roomDB.GroupedInvoice
 import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.DialogDeleteItemBinding
 import com.sunil.dhwarehouse.databinding.ItemGroupedInvoiceBinding
@@ -41,10 +39,10 @@ class GroupedInvoiceAdapter(
 
         holder.binding.tvTotalItem.text = "TOTAL ITEM :- " + groupedInvoice.invoices.size.toString()
 
-        val totalQty = UtilsFile().roundValues(groupedInvoice.invoices.sumOf { it.qty })
+        val totalQty = UtilsFile().roundValues(groupedInvoice.invoices.sumOf { it.qty }.toDouble())
         holder.binding.tvTotalItemQty.text ="TOTAL QTY :- "+totalQty.toInt().toString()
 
-        val totalAmount = UtilsFile().roundValues(groupedInvoice.invoices.sumOf { it.subTotal })
+        val totalAmount = UtilsFile().roundValues(groupedInvoice.invoices.sumOf { it.amount })
         holder.binding.tvTotalAmount.text ="TOTAL AMOUNT :- "+"${context.getString(R.string.rs)}$totalAmount"
 
         // Set up the nested RecyclerView
@@ -105,10 +103,13 @@ class GroupedInvoiceAdapter(
     }
 
     fun removeItem(position: Int) {
-        groupedInvoices.removeAt(position)
-        notifyItemRemoved(position)
-        notifyItemRangeChanged(position, itemCount)
-
+        if (position >= 0 && position < groupedInvoices.size) {
+            groupedInvoices.removeAt(position)
+            notifyItemRemoved(position)
+            if (position < groupedInvoices.size) {
+                notifyItemRangeChanged(position, groupedInvoices.size - position)
+            }
+        }
     }
 
     override fun getItemCount(): Int {

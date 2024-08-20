@@ -1,4 +1,4 @@
-package com.sunil.dhwarehouse.RoomDB
+package com.sunil.dhwarehouse.roomDB
 
 import androidx.room.Dao
 import androidx.room.Insert

@@ -1,21 +1,25 @@
 package com.sunil.dhwarehouse.adapter
 
 import android.app.Activity
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.ItemDao
-import com.sunil.dhwarehouse.RoomDB.ItemMaster
+import com.sunil.dhwarehouse.roomDB.ItemDao
+import com.sunil.dhwarehouse.roomDB.ItemMaster
 import com.sunil.dhwarehouse.common.ToastUtils
+import com.sunil.dhwarehouse.common.UtilsFile
 import com.sunil.dhwarehouse.databinding.ItemProductRowBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,8 +34,8 @@ class ItemProductAdapter(
     private var accountDao: ItemDao,
     private var btnRequestOrder: RelativeLayout,
     private var recyclerView: RecyclerView,
-    var txtSubtotalRS: TextView,
-    var txtTotalItem: TextView,
+    private var txtSubtotalRS: TextView,
+    private var txtTotalItem: TextView,
     private var btnClickRequestOrder: TextView,
     private var totalDataitemMasterList1: MutableList<ItemMaster>
 ) : RecyclerView.Adapter<ItemProductAdapter.ViewHolder>() {
@@ -44,6 +48,7 @@ class ItemProductAdapter(
     var scmRs = 0.0
     var selectItemList: MutableList<ItemMaster> = ArrayList()
     var isToastShown = false
+    private var focusPosition: Int? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
@@ -68,6 +73,14 @@ class ItemProductAdapter(
             "${context.getString(R.string.rs)}" + itemMaster.mrp.toString()
 
         holder.binding.txtTotalQty.text = itemMaster.stock_qty.toInt().toString()
+
+//        // Handle focus logic
+//        if (position == focusPosition) {
+//            Handler(Looper.getMainLooper()).post {
+//                holder.binding.edtAddQty.requestFocus()
+//            }
+//        }
+        setupFocusChange(holder, holder.adapterPosition)
 
         holder.myCustomEditTextListener.updatePosition(
             holder.adapterPosition, holder.binding, itemMaster
@@ -99,7 +112,7 @@ class ItemProductAdapter(
 
             holder.binding.ivClearProduct.visibility = View.GONE
             holder.binding.linerTotal.visibility = View.GONE
-
+            UtilsFile.isQtyBack = false
         } else {
             holder.binding.edtAddQty.setText(
                 itemMasterList[holder.adapterPosition].edtxt_qty.toInt().toString()
@@ -120,7 +133,7 @@ class ItemProductAdapter(
             } else {
                 holder.binding.edtAddScm.setText("")
             }
-
+            UtilsFile.isQtyBack = false
             selectItemListData()
 
             holder.binding.edtAddQtyFree.enabled()
@@ -141,7 +154,6 @@ class ItemProductAdapter(
             holder.binding.edtAddQtyFree.enabled()
             holder.binding.edtAddScm.enabled()
         }
-
 
         holder.binding.txtProductSubTotal.text =
             itemMasterList[holder.adapterPosition].txt_subTotal.toString()
@@ -179,14 +191,41 @@ class ItemProductAdapter(
             holder.binding.edtAddScm.enabled()
 
             btnRequestOrder.visibility = if (selectItemList.size == 0) View.GONE else View.VISIBLE
+            if (selectItemList.size == 0) {
+                UtilsFile.isQtyBack = false
+            }
         }
+    }
+
+    private fun setupFocusChange(holder: ViewHolder, position: Int) {
+        val editTexts = arrayOf(
+            holder.binding.edtAddQty, holder.binding.edtAddQtyFree,
+            holder.binding.edtAddScm, holder.binding.edtMargin
+        )
+        for (i in editTexts.indices) {
+            editTexts[i].setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE) {
+                    val nextIndex = i + 1
+                    if (nextIndex < editTexts.size) {
+                        if (itemMasterList[holder.adapterPosition].edtxt_free > 0.0) {
+                            editTexts[nextIndex + 1].requestFocus()
+                        } else {
+                            editTexts[nextIndex].requestFocus()
+                        }
+                    }
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+
     }
 
 
     override fun getItemCount(): Int {
         return itemMasterList.size
     }
-
     override fun onViewAttachedToWindow(holder: ViewHolder) {
         holder.enableTextWatcher()
     }
@@ -374,9 +413,9 @@ class ItemProductAdapter(
                         accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
                         accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
                         accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
-                        accountDao.updateItem(item = itemMaster.copy(stock_qty = itemMasterList[position].old_stockQty))
+                        // accountDao.updateItem(item = itemMaster.copy(stock_qty = itemMasterList[position].old_stockQty))
                     }
-                    itemMasterList[position].stock_qty = itemMasterList[position].old_stockQty
+                    //     itemMasterList[position].stock_qty = itemMasterList[position].old_stockQty
 
                     binding.txtTotalQty.text = itemMaster.stock_qty.toInt().toString()
                     binding.ivClearProduct.visibility = View.GONE
@@ -419,6 +458,7 @@ class ItemProductAdapter(
             binding.ivClearProduct.visibility = View.VISIBLE
             binding.linerTotal.visibility = View.VISIBLE
             btnRequestOrder.visibility = View.VISIBLE
+            UtilsFile.isQtyBack = true
         }
 
         override fun afterTextChanged(editable: Editable) {
@@ -742,7 +782,6 @@ class ItemProductAdapter(
                     } else {
                         Log.d("TextWatcher", "Text is neither empty nor '0'")
                     }
-
 
                 }
             } catch (e: NumberFormatException) {

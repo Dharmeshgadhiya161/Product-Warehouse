@@ -5,9 +5,9 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.sunil.dhwarehouse.Activity.ItemProductActivity
+import com.sunil.dhwarehouse.activity.ItemProductActivity
 import com.sunil.dhwarehouse.R
-import com.sunil.dhwarehouse.RoomDB.AccountMaster
+import com.sunil.dhwarehouse.roomDB.AccountMaster
 import com.sunil.dhwarehouse.databinding.AccountItemRowBinding
 
 class AccountDataAdapter(
@@ -44,7 +44,7 @@ class AccountDataAdapter(
                 query1,
                 context.getColor(R.color.colorPrimary)
             ) // Change the highlight color
-            binding.txtAccountAddress.text = accountMaster.addess
+            binding.txtAccountAddress.setText(accountMaster.addess +"("+accountMaster.day +")")
             binding.txtAccountPhone.setHighlightText(
                 accountMaster.mobile_no,
                 query1,
@@ -63,22 +63,4 @@ class AccountDataAdapter(
 
         }
     }
-
-
-//    fun filter(text: String) {
-//        Log.d("MyAdapter", "Filtering for query: $text")
-//        filteredDataList.clear()
-//        if (text.isEmpty()) {
-//            filteredDataList.addAll(masterMutableList)
-//        } else {
-//            val lowerCaseQuery = text.lowercase()
-//            for (item in masterMutableList) {
-//                if (item.account_name.lowercase().contains(lowerCaseQuery)) {
-//                    filteredDataList.add(item)
-//                }
-//            }
-//        }
-//        Log.d("MyAdapter", "Filtered list size: ${filteredDataList.size}")
-//        notifyDataSetChanged()
-//    }
 }

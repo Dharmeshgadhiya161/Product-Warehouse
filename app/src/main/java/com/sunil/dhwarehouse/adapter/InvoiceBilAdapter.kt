@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.sunil.dhwarehouse.RoomDB.InvoiceMaster
+import com.sunil.dhwarehouse.roomDB.InvoiceMaster
 import com.sunil.dhwarehouse.databinding.InvoiceBilItemRowBinding
 
 class InvoiceBilAdapter(
