@@ -99,14 +99,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.txtUsername.text = getUserName
 
-        val inAppMessaging = FirebaseInAppMessaging.getInstance()
-        inAppMessaging.addClickListener { inAppMessage, action ->
-            // Determine which URL the user clicked
-            val url = action.actionUrl
-            // Get general information about the campaign
-            val metadata = inAppMessage.campaignMetadata
-            Log.e(TAG, "onCreate: $metadata")
-        }
 
         binding.searchView.setOnQueryTextListener { query ->
             filterAccounts(query)

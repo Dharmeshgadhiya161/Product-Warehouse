@@ -241,6 +241,7 @@ class ItemProductActivity : AppCompatActivity(), ClickItemCategory {
                     itemProductAdapter.updateData(productWiseItemList, "")
                     itemProductAdapter.updateTotalData(itemMasterList)
                     UtilsFile.isChangeValues = false
+                    UtilsFile.isQtyBack=true
                 }
             }
         }

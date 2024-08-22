@@ -134,7 +134,7 @@
                     android:fontFamily="@font/roboto_medium"
                     android:gravity="center"
                     android:paddingVertical="@dimen/_2sdp"
-                    android:text="Scm(%)"
+                    android:text="Sch(%)"
                     android:textColor="@color/black"
                     android:textSize="12sp" />
 

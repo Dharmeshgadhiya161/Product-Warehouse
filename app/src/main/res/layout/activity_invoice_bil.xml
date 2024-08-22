@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="@dimen/_3sdp"
-            android:layout_toLeftOf="@id/ivExcelFile"
+            android:layout_toLeftOf="@id/ivDeleteExcelFile"
             android:layout_toRightOf="@id/ivBack"
             android:fontFamily="@font/roboto_medium"
             android:gravity="center"
@@ -39,14 +39,13 @@
             android:textSize="18sp" />
 
         <ImageView
-            android:id="@+id/ivExcelFile"
-            android:layout_width="@dimen/_26sdp"
+            android:id="@+id/ivDeleteExcelFile"
+            android:layout_width="@dimen/_22sdp"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
-            android:padding="@dimen/_3sdp"
-
-            android:src="@drawable/iv_excel_file"
-            android:visibility="invisible" />
+            android:padding="@dimen/_2sdp"
+            android:src="@drawable/iv_bin"
+            android:visibility="visible" />
 
     </RelativeLayout>
 

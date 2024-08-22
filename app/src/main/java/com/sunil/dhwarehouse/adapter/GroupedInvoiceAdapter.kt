@@ -112,6 +112,14 @@ class GroupedInvoiceAdapter(
         }
     }
 
+    fun removeItemAll() {
+      //  if (position >= 0 && position < groupedInvoices.size) {
+            groupedInvoices.clear()
+           notifyDataSetChanged()
+
+      //  }
+    }
+
     override fun getItemCount(): Int {
         return groupedInvoices.size
     }

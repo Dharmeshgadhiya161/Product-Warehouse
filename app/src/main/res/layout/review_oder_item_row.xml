@@ -31,6 +31,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.7"
             android:maxLength="6"
+            android:inputType="number"
             android:textAlignment="center" />
 
         <EditText
@@ -39,6 +40,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.7"
             android:maxLength="6"
+            android:inputType="number"
             android:textAlignment="center" />
 
         <EditText
@@ -46,6 +48,7 @@
             style="@style/table_row_item"
             android:layout_width="0dp"
             android:maxLength="8"
+            android:inputType="number"
             android:layout_weight="0.8"
             android:textAlignment="center" />
 
@@ -53,9 +56,10 @@
             android:id="@+id/edtMargin"
             style="@style/table_row_item"
             android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_weight="0.8"
+            android:inputType="number"
             android:textAlignment="center"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/txtNetSale"
@@ -94,150 +98,6 @@
             android:layout_weight="1"
             android:orientation="horizontal"
             android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/bg_light_col_rectangle"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_light_col_txt_rectangle"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:paddingVertical="@dimen/_2sdp"
-                    android:text="Qty"
-                    android:textColor="@color/black"
-                    android:textSize="12sp" />
-
-                <!--                <EditText-->
-                <!--                    android:id="@+id/edtAddQty"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="match_parent"-->
-                <!--                    android:layout_marginHorizontal="2dp"-->
-                <!--                    android:background="@android:color/transparent"-->
-                <!--                    android:focusable="true"-->
-                <!--                    android:focusableInTouchMode="true"-->
-                <!--                    android:fontFamily="@font/roboto_medium"-->
-                <!--                    android:gravity="center"-->
-                <!--                    android:inputType="number"-->
-                <!--                    android:maxLength="8"-->
-                <!--                    android:maxLines="1"-->
-                <!--                    android:textColor="@color/black"-->
-                <!--                    android:textSize="13sp" />-->
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/_3sdp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_light_col_rectangle"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_light_col_txt_rectangle"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:paddingVertical="@dimen/_2sdp"
-                    android:text="Free"
-                    android:textColor="@color/black"
-                    android:textSize="12sp" />
-
-                <!--                <EditText-->
-                <!--                    android:id="@+id/edtAddQtyFree"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="match_parent"-->
-                <!--                    android:layout_marginHorizontal="2dp"-->
-                <!--                    android:background="@android:color/transparent"-->
-                <!--                    android:fontFamily="@font/roboto_medium"-->
-                <!--                    android:gravity="center"-->
-                <!--                    android:inputType="numberDecimal"-->
-                <!--                    android:maxLength="8"-->
-                <!--                    android:maxLines="1"-->
-                <!--                    android:textColor="@color/black"-->
-                <!--                    android:textSize="13sp" />-->
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/_3sdp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_light_col_rectangle"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_light_col_txt_rectangle"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:paddingVertical="@dimen/_2sdp"
-                    android:text="Scm(%)"
-                    android:textColor="@color/black"
-                    android:textSize="12sp" />
-
-                <!--                <EditText-->
-                <!--                    android:id="@+id/edtAddScm"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="match_parent"-->
-                <!--                    android:layout_marginHorizontal="2dp"-->
-                <!--                    android:background="@android:color/transparent"-->
-                <!--                    android:fontFamily="@font/roboto_medium"-->
-                <!--                    android:gravity="center"-->
-                <!--                    android:inputType="numberDecimal"-->
-                <!--                    android:maxLength="8"-->
-                <!--                    android:maxLines="1"-->
-                <!--                    android:textColor="@color/black"-->
-                <!--                    android:textSize="13sp" />-->
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/_3sdp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_light_col_rectangle"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_light_col_txt_rectangle"
-                    android:fontFamily="@font/roboto_medium"
-                    android:gravity="center"
-                    android:paddingVertical="@dimen/_2sdp"
-                    android:text="Margin"
-                    android:textColor="@color/black"
-                    android:textSize="12sp" />
-
-                <!--                <EditText-->
-                <!--                    android:id="@+id/edtMargin"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="match_parent"-->
-                <!--                    android:layout_marginHorizontal="2dp"-->
-                <!--                    android:background="@android:color/transparent"-->
-                <!--                    android:fontFamily="@font/roboto_medium"-->
-                <!--                    android:gravity="center"-->
-                <!--                    android:inputType="numberDecimal"-->
-                <!--                    android:maxLength="8"-->
-                <!--                    android:maxLines="1"-->
-                <!--                    android:textColor="@color/black"-->
-                <!--                    android:textSize="13sp" />-->
-
-
-            </LinearLayout>
 
         </LinearLayout>
         <!--=======================================-->

@@ -45,6 +45,7 @@ class InvoiceViewActivity : AppCompatActivity() {
     var date = ""
     var time = ""
     private var timeSecond = ""
+    private var receivePayment:Double=0.0
     private lateinit var invoiceListBilAct: MutableList<InvoiceMaster>
     private var isInvoiceBilActivity: Boolean = false
     private lateinit var itemMasterList: MutableList<ItemMaster>
@@ -80,6 +81,7 @@ class InvoiceViewActivity : AppCompatActivity() {
             date = intent.getStringExtra("Date").toString()
             time = intent.getStringExtra("Time").toString()
             timeSecond = intent.getStringExtra("TimeSecond").toString()
+            receivePayment = intent.getDoubleExtra("receivePayment",0.0)
 
             println("Date: $date")
             println("Time: $time")
@@ -89,6 +91,7 @@ class InvoiceViewActivity : AppCompatActivity() {
             binding.txtDateTime.text = (date + " " + time)
             binding.txtMedicalAddress.text = medicalAddress
             binding.txtMedicalPhone.text = mobileNo
+            binding.edtPayReceive.text=receivePayment.toString()
         }
         binding.ivCSVShare.setOnClickListener {
             if (isInvoiceBilActivity) {
@@ -166,7 +169,7 @@ class InvoiceViewActivity : AppCompatActivity() {
                         invoicesList,
                         totalItems,
                         UtilsFile().roundValues(totalSch),
-                        UtilsFile().roundValues(totalAmount),totalFreeQty
+                        UtilsFile().roundValues(totalAmount), totalFreeQty
                     )
                     binding.rvInvoice.layoutManager = LinearLayoutManager(this@InvoiceViewActivity)
                     binding.rvInvoice.adapter = invoiceViewAdapter
@@ -188,6 +191,7 @@ class InvoiceViewActivity : AppCompatActivity() {
                         binding.txtDateTime.text = (item.date + " " + item.time)
                         binding.txtMedicalAddress.text = item.address
                         binding.txtMedicalPhone.text = item.mobile_no
+                        binding.edtPayReceive.text = item.receiveAmount.toString()
                     }
 
                     // Calculate totals
@@ -223,12 +227,12 @@ class InvoiceViewActivity : AppCompatActivity() {
                 var isSuccess: Boolean
                 if (invoicesList.isNotEmpty()) {
                     val filePath = getCsvFilePath(medicalName + fileExtension)
-                    if(!isPDFShare){
-                         isSuccess = writeInvoicesToCsv(invoicesList, filePath)
-                    }else{
+                    if (!isPDFShare) {
+                        isSuccess = writeInvoicesToCsv(invoicesList, filePath)
+                    } else {
                         // Group the invoices by the `no` (invoice number)
                         val groupedInvoices = invoicesList.groupBy { it.no }
-                         isSuccess = writeGroupedInvoicesToPdf(
+                        isSuccess = writeGroupedInvoicesToPdf(
                             this@InvoiceViewActivity,
                             groupedInvoices,
                             filePath,
@@ -331,7 +335,6 @@ class InvoiceViewActivity : AppCompatActivity() {
     }
 
 
-
 //    private fun writeInvoicesToCsv(invoices: List<InvoiceMaster>, filePath: String): Boolean {
 //        return try {
 //            val file = File(filePath)
@@ -376,8 +379,6 @@ class InvoiceViewActivity : AppCompatActivity() {
             Toast.makeText(this@InvoiceViewActivity, "File not found", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 
 
 //    private fun deleteLastItem(invoiceListBilAct: MutableList<InvoiceMaster>) {

@@ -12,12 +12,14 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.sunil.dhwarehouse.MainActivity
@@ -42,10 +44,8 @@ import java.io.File
 
 class LoginUserActivity : AppCompatActivity() {
     lateinit var binding: ActivityLoginUserBinding
-    lateinit var sharedPrefManager: SharedPrefManager
-    val storage_permission_code = 1000
-    val fileRequestCode = 10
-    var fileType: Int = 0
+    private lateinit var sharedPrefManager: SharedPrefManager
+    private val storage_permission_code = 1000
     private lateinit var aryAccount1: MutableList<AccountMaster>
     lateinit var dialog: Dialog
     private lateinit var showingDialog: ShowingDialog
@@ -70,6 +70,23 @@ class LoginUserActivity : AppCompatActivity() {
         aryAccount1 = ArrayList()
         dialog = Dialog(this)
         setProgressShowDialog(this, "Loading.. Excel File!")
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permissionLauncher = registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { isGranted ->
+                if (isGranted) {
+                    subscribeToNotifications()
+                } else {
+                    showPermissionDeniedMessage()
+                }
+            }
+
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            subscribeToNotifications()
+        }
+
 
         binding.btnLogin.setOnClickListener {
             val inputText = binding.edtUserName.text.toString()
@@ -154,6 +171,7 @@ class LoginUserActivity : AppCompatActivity() {
         if (requestCode == storage_permission_code) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 if (NetworkUtil.isInternetAvailable(this)) {
+                    showDialog(this)
                     downloadAccountMasterFile()
                 } else {
                     DialogUtil.showNoInternetDialog(this)
@@ -349,5 +367,22 @@ class LoginUserActivity : AppCompatActivity() {
         dismissDialog(this)
     }
 
+    private fun subscribeToNotifications() {
+        FirebaseMessaging.getInstance().subscribeToTopic(UtilsFile.firebaseMessagSubscribeToTopic)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Subscribed to notifications", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Failed to subscribe to notifications", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
 
+    private fun showPermissionDeniedMessage() {
+        Toast.makeText(
+            this,
+            "Notification permission denied. You won't receive notifications.",
+            Toast.LENGTH_LONG
+        ).show()
+    }
 }

@@ -23,6 +23,7 @@ class UtilsFile {
         const val localSaveAccountFileName = "account_master.xlsx"
         const val fileExcelItem = "stock leger margine.xlsx"
         const val localSaveItemFileName = "stock_leger_margine.xlsx"
+        const val firebaseMessagSubscribeToTopic = "update_file"
 
         private const val TAG = "Utils"
         var isQtyBack: Boolean = false

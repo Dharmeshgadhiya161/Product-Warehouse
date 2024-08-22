@@ -1,8 +1,14 @@
 package com.sunil.dhwarehouse.activity
 
+import android.app.Dialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +21,8 @@ import com.sunil.dhwarehouse.roomDB.GroupedInvoice
 import com.sunil.dhwarehouse.roomDB.MasterDatabase
 import com.sunil.dhwarehouse.adapter.GroupedInvoiceAdapter
 import com.sunil.dhwarehouse.databinding.ActivityInvoiceBilBinding
+import com.sunil.dhwarehouse.databinding.DialogAllDeleteItemBinding
+import com.sunil.dhwarehouse.databinding.DialogDeleteItemBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -93,6 +101,36 @@ class InvoiceBilActivity : AppCompatActivity() {
                 Log.e("TAG", "Error fetching invoices: ${e.message}")
             }
         }
+
+        binding.ivDeleteExcelFile.setOnClickListener {
+            if (groupedInvoiceList.size != 0) {
+                showAllDeleteDialog()
+            }
+        }
+
+    }
+
+    private fun handleAllDelete() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val database = MasterDatabase.getDatabase(this@InvoiceBilActivity)
+                //     val invoiceToDelete = groupedInvoiceList[position]
+                database.invoiceDao().deleteAllInvoiceItem()
+
+                withContext(Dispatchers.Main) {
+                    invoiceBilAdapter.removeItemAll()
+
+                    Toast.makeText(
+                        this@InvoiceBilActivity,
+                        "All Item deleted successfully",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    updateRecyclerView()
+                }
+            } catch (e: Exception) {
+                Log.e("TAG", "Error deleting invoice: ${e.message}")
+            }
+        }
     }
 
     private fun handleDelete(position: Int) {
@@ -135,6 +173,31 @@ class InvoiceBilActivity : AppCompatActivity() {
 
     private fun parseTime(time: String): LocalTime {
         return LocalTime.parse(time, DateTimeFormatter.ofPattern("hh:mm a"))
+    }
+
+
+    private fun showAllDeleteDialog() {
+
+        var dialog = Dialog(this@InvoiceBilActivity)
+        val binding: DialogAllDeleteItemBinding =
+            DialogAllDeleteItemBinding.inflate(LayoutInflater.from(this))
+        dialog.setContentView(binding.getRoot())
+        dialog.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT
+        )
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.setCancelable(false)
+        dialog.show()
+
+        binding.btnYes.setOnClickListener {
+            handleAllDelete()
+            dialog.dismiss()
+        }
+        binding.btnNo.setOnClickListener {
+            dialog.dismiss()
+        }
+
     }
 
     override fun onBackPressed() {

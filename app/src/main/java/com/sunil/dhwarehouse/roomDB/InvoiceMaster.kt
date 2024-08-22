@@ -17,13 +17,14 @@ data class InvoiceMaster(
     var mobile_no: String = "",
     var date: String = "",
     var time: String = "",
-    var timeSecond:String="",
+    var timeSecond: String = "",
     var productItemName: String = "",
     var mrp: Double = 0.0,
     var qty: Int = 0,
     var free: Int = 0,
     var scm: Double = 0.0,
     var rate: Double = 0.0,
-    var amount: Double = 0.0
+    var amount: Double = 0.0,
+    var receiveAmount: Double = 0.0
 
 ) : Parcelable

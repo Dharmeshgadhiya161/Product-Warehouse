@@ -96,7 +96,7 @@ class InvoiceViewAdapter(
 
         } else if (holder is FooterViewHolder) {
 
-            holder.bindingFooter.txtTotalItemQty.text = totalItems.toString() +"     " +if(totalFreeQty == 0) "" else totalFreeQty.toString()
+            holder.bindingFooter.txtTotalItemQty.text = totalItems.toString() //  +"     " +if(totalFreeQty == 0) "" else totalFreeQty.toString()
 //            holder.bindingFooter.txtTotalItemFreeQty.text =  if (totalFreeQty == 0) "" else totalFreeQty.toString()
 //            holder.bindingFooter.txtTotalSch.text = if (totalSch == 0.0) "" else totalSch.toString()
             holder.bindingFooter.txtTotalRs.text =

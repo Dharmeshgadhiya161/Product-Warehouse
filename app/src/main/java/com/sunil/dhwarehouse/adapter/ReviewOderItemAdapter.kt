@@ -58,7 +58,7 @@ class ReviewOderItemAdapter(
     private var totalSubTotal = 0.0
     private var totalItem = 0
     var isToastShown = false
-
+    private var receivePayment: Double = 0.0
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
             ReviewOderItemRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -127,7 +127,7 @@ class ReviewOderItemAdapter(
             holder.binding.txtCountQty.text = ""
             holder.binding.txtProductSubTotal.text = ""
 
-            holder.binding.ivClearProduct.visibility = View.GONE
+            holder.binding.ivClearProduct.visibility = View.INVISIBLE
             holder.binding.linerTotal.visibility = View.GONE
 
         } else {
@@ -209,69 +209,74 @@ class ReviewOderItemAdapter(
         }
 
         btnClickRequestOrder.setOnClickListener {
-            showingDialog.show()
-            // Example usage
-            val (date, time) = UtilsFile().getFormattedDateTime()
-            println("Date: $date")
-            println("Time: $time")
-            val formattedTimeSecond = UtilsFile().getFormattedTimeSecond()
+            if (selectItemList.size != 0) {
+                showingDialog.show()
+                // Example usage
+                val (date, time) = UtilsFile().getFormattedDateTime()
+                println("Date: $date")
+                println("Time: $time")
+                val formattedTimeSecond = UtilsFile().getFormattedTimeSecond()
 
-            var invoice: InvoiceMaster
-            // Use a list to batch insert invoices if needed
-            val invoicesToInsert = mutableListOf<InvoiceMaster>()
-            for (item in selectItemList) {
+                var invoice: InvoiceMaster
+                // Use a list to batch insert invoices if needed
+                val invoicesToInsert = mutableListOf<InvoiceMaster>()
+                for (item in selectItemList) {
 
+                    invoice = InvoiceMaster(
+                        salesName = getUserName,
+                        account_name = medicalName,
+                        address = medicalAddress,
+                        mobile_no = mobileNo,
+                        date = date,
+                        time = time,
+                        timeSecond = formattedTimeSecond,
+                        productItemName = item.item_name,
+                        mrp = item.mrp,
+                        qty = item.edtxt_qty.toInt(),
+                        free = item.edtxt_free.toInt(),
+                        scm = item.edtxt_scm,
+                        rate = item.txt_net_rate,
+                        amount = item.txt_subTotal,
+                        receiveAmount = receivePayment
+                    )
+                    invoicesToInsert.add(invoice)
+                }
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        // Batch insert all invoices if supported by your DAO
+                        invoiceDao.insertAll(invoicesToInsert)
+                        Log.e(TAG, "Invoices inserted successfully")
 
-                invoice = InvoiceMaster(
-                    salesName = getUserName,
-                    account_name = medicalName,
-                    address = medicalAddress,
-                    mobile_no = mobileNo,
-                    date = date,
-                    time = time,
-                    timeSecond=formattedTimeSecond,
-                    productItemName = item.item_name,
-                    mrp = item.mrp,
-                    qty = item.edtxt_qty.toInt(),
-                    free = item.edtxt_free.toInt(),
-                    scm = item.edtxt_scm,
-                    rate = item.txt_net_rate,
-                    amount = item.txt_subTotal
-                )
-                invoicesToInsert.add(invoice)
-            }
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    // Batch insert all invoices if supported by your DAO
-                    invoiceDao.insertAll(invoicesToInsert)
-                    Log.e(TAG, "Invoices inserted successfully")
-
-                    withContext(Dispatchers.Main) {
-                        val intent = Intent(context, InvoiceViewActivity::class.java)
-                        intent.putExtra("getUserName", getUserName)
-                        intent.putExtra("MedicalName", medicalName)
-                        intent.putExtra("MedicalAddress", medicalAddress)
-                        intent.putExtra("MobileNo", mobileNo)
-                        intent.putExtra("Date", date)
-                        intent.putExtra("Time", time)
-                        intent.putExtra("TimeSecond", formattedTimeSecond)
-                        context.startActivity(intent)
-                        if (showingDialog.isShowing) {
-                            showingDialog.dismiss()
+                        withContext(Dispatchers.Main) {
+                            val intent = Intent(context, InvoiceViewActivity::class.java)
+                            intent.putExtra("getUserName", getUserName)
+                            intent.putExtra("MedicalName", medicalName)
+                            intent.putExtra("MedicalAddress", medicalAddress)
+                            intent.putExtra("MobileNo", mobileNo)
+                            intent.putExtra("Date", date)
+                            intent.putExtra("Time", time)
+                            intent.putExtra("TimeSecond", formattedTimeSecond)
+                            intent.putExtra("receivePayment", receivePayment)
+                            context.startActivity(intent)
+                            if (showingDialog.isShowing) {
+                                showingDialog.dismiss()
+                            }
+                            context.finish()
                         }
-                        context.finish()
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error inserting invoices: ${e.message}")
-                    withContext(Dispatchers.Main) {
-                        // Dismiss the dialog even if there's an error
-                        if (showingDialog.isShowing) {
-                            showingDialog.dismiss()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error inserting invoices: ${e.message}")
+                        withContext(Dispatchers.Main) {
+                            // Dismiss the dialog even if there's an error
+                            if (showingDialog.isShowing) {
+                                showingDialog.dismiss()
+                            }
+                            Toast.makeText(context, "Failed to insert invoices", Toast.LENGTH_SHORT)
+                                .show()
                         }
-                        Toast.makeText(context, "Failed to insert invoices", Toast.LENGTH_SHORT)
-                            .show()
                     }
                 }
+            } else {
+                Toast.makeText(context, "Empty Data", Toast.LENGTH_SHORT).show()
             }
 
         }
@@ -371,39 +376,22 @@ class ReviewOderItemAdapter(
                         binding.edtAddQty.text.clear()
                     }
                     //TODO this code use already scm values editText box add, and qty values add on this time code use
-                } else if (itemMasterList[position].edtxt_scm > 0.0) {
-                    binding.txtCountQty.text = input
-                    qtyTotalStock = itemMaster.stock_qty - itemMasterList[position].edtxt_qty
-                    binding.txtTotalQty.text = qtyTotalStock.toString()
-
-                    itemMasterList[position].old_stockQty = qtyTotalStock
-
-                    saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
-                    scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
-                    netSaleRate = saleRate - scmRs
-                    itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
-                    binding.txtNetSale.text =
-                        "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
-                    subTotalResult = calculateSubTotalRound(
-                        netSaleRate,
-                        itemMasterList[position].edtxt_qty
-                    ).toString()
-                    binding.txtProductSubTotal.text =
-                        "${context.getString(R.string.rs)}" + subTotalResult
-
-                    itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
-
-                    binding.edtAddQtyFree.disable()
-
-
-                    GlobalScope.launch(Dispatchers.IO) {
-                        accountDao.updateItem(item = itemMaster.copy(edtxt_qty = input.toDouble()))
-                        accountDao.updateItem(item = itemMaster.copy(txt_net_rate = netSaleRate))
-                        accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
+                } else if (itemMasterList[position].edtxt_scm > 0.0 && itemMasterList[position].margin == itemMasterList[position].old_margin) {
+                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
+                        customSCHAfterChangeQTY(input)
+                    } else {
+                        afterCheckSCHAndMarginStockQTY()
                     }
-
-                    binding.ivClearProduct.visibility = View.VISIBLE
-                    binding.linerTotal.visibility = View.VISIBLE
+                }
+                // TODO this code in QTY Change.custom Margin editText and SCH EditText values to use this code
+                else if (itemMasterList[position].edtxt_scm != 0.0
+                    && itemMasterList[position].margin != itemMasterList[position].old_margin
+                ) {
+                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
+                        customMarginAfterChangeQTY(input)
+                    } else {
+                        afterCheckSCHAndMarginStockQTY()
+                    }
                 } else {
                     if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
                         qtyTotalStock = itemMaster.stock_qty - itemMasterList[position].edtxt_qty
@@ -435,7 +423,6 @@ class ReviewOderItemAdapter(
                         }
                     }
                 }
-
                 selectItemListData()
             } else {
                 //TODO use to if free edit text data hoy ne and qty data 0 hoy tare total qty data update
@@ -449,7 +436,7 @@ class ReviewOderItemAdapter(
                         accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
                     }
 
-                    binding.ivClearProduct.visibility = View.GONE
+                    binding.ivClearProduct.visibility = View.INVISIBLE
                     binding.linerTotal.visibility = View.GONE
 
                     itemMasterList[position].edtxt_qty = 0.0
@@ -465,7 +452,7 @@ class ReviewOderItemAdapter(
                         accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
                     }
                     binding.txtTotalQty.text = itemMaster.stock_qty.toString()
-                    binding.ivClearProduct.visibility = View.GONE
+                    binding.ivClearProduct.visibility = View.INVISIBLE
                     binding.linerTotal.visibility = View.GONE
 
                     itemMasterList[position].edtxt_qty = 0.0
@@ -478,6 +465,103 @@ class ReviewOderItemAdapter(
                 selectItemListData()
 
             }
+        }
+
+        private fun afterCheckSCHAndMarginStockQTY() {
+            if (!isToastShown) {
+                ToastUtils.showCustomToast(
+                    context,
+                    "Stock QTY Available :- " + itemMasterList[position].stock_qty.toInt(),
+                    Toast.LENGTH_SHORT
+                )
+                isToastShown = true
+
+                GlobalScope.launch(Dispatchers.IO) {
+                    accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
+                    accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
+                    accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
+                    accountDao.updateItem(item = itemMaster.copy(margin = itemMasterList[position].old_margin))
+                }
+                binding.edtAddQty.text.clear()
+                binding.edtAddScm.text.clear()
+                itemMasterList[position].margin = itemMasterList[position].old_margin
+                binding.edtMargin.setText(roundValues(itemMasterList[position].margin).toString())
+                itemMasterList[position].edtxt_qty = 0.0
+                itemMasterList[position].edtxt_scm = 0.0
+                itemMasterList[position].txt_net_rate = 0.0
+                itemMasterList[position].txt_subTotal = 0.0
+            }
+        }
+
+        private fun customSCHAfterChangeQTY(edtQTYInput: String) {
+            binding.txtCountQty.text = edtQTYInput
+            Log.e(TAG, "onTextChanged:QTyEditText ${itemMasterList[position].edtxt_scm}")
+            binding.txtTotalQty.text =
+                (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toInt()
+                    .toString()
+
+            saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
+            scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
+            netSaleRate = saleRate - scmRs
+            itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
+            binding.txtNetSale.text = roundValues(netSaleRate).toString()
+            subTotalResult = calculateSubTotalRound(
+                netSaleRate,
+                itemMasterList[position].edtxt_qty
+            ).toString()
+            binding.txtProductSubTotal.text = subTotalResult
+
+            itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
+            binding.edtAddQtyFree.disable()
+
+
+            GlobalScope.launch(Dispatchers.IO) {
+                accountDao.updateItem(item = itemMaster.copy(edtxt_qty = edtQTYInput.toDouble()))
+                accountDao.updateItem(
+                    item = itemMaster.copy(
+                        txt_net_rate = roundValues(
+                            netSaleRate
+                        )
+                    )
+                )
+                accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
+            }
+
+            binding.ivClearProduct.visibility = View.VISIBLE
+            binding.linerTotal.visibility = View.VISIBLE
+        }
+
+        private fun customMarginAfterChangeQTY(edtQty: String) {
+            saleRate = customMarginCalculateResult(
+                itemMasterList[position].mrp,
+                itemMasterList[position].margin,
+                itemMasterList[position].edtxt_scm
+            ).toDouble()
+
+            Log.e(TAG, "onTextChanged editQTY SaleRate:<margin> $saleRate")
+            scmRs = (itemMasterList[position].mrp * itemMasterList[position].edtxt_scm) / 100
+            Log.e(TAG, "onTextChanged editQTY schRS:<ma> $scmRs")
+            netSaleRate = itemMasterList[position].mrp - scmRs
+            itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
+            Log.e(TAG, "onTextChanged editQTY NetSaleRate:<ma> $netSaleRate")
+            binding.txtNetSale.text = roundValues(netSaleRate).toString()
+            subTotalResult = calculateSubTotalRound(
+                netSaleRate,
+                itemMasterList[position].edtxt_qty
+            ).toString()
+            binding.txtProductSubTotal.text = subTotalResult
+            itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
+            GlobalScope.launch(Dispatchers.IO) {
+                accountDao.updateItem(item = itemMaster.copy(edtxt_qty = edtQty.toDouble()))
+                accountDao.updateItem(item = itemMaster.copy(txt_net_rate = netSaleRate))
+                accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
+            }
+
+            selectItemListData()
+            binding.ivClearProduct.visibility = View.VISIBLE
+            binding.linerTotal.visibility = View.VISIBLE
         }
 
         private fun updateQtyItem(input: String) {
@@ -522,7 +606,6 @@ class ReviewOderItemAdapter(
             "${context.getString(R.string.rs)}" + roundValues(totalSubTotal).toString()
         totalItem = selectItemList.size
         txtTotalItem.text = totalItem.toString() + " Items"
-
     }
 
     inner class FreeQtyEditTextListener : TextWatcher {
@@ -633,8 +716,7 @@ class ReviewOderItemAdapter(
                     scmRs = (saleRate * ediScmValue) / 100
                     netSaleRate = saleRate - scmRs
                     itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
-                    binding.txtNetSale.text =
-                        "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
+                    binding.txtNetSale.text = roundValues(netSaleRate).toString()
                     subTotalResult = calculateSubTotalRound(
                         netSaleRate,
                         itemMasterList[position].edtxt_qty
@@ -648,43 +730,83 @@ class ReviewOderItemAdapter(
                     GlobalScope.launch(Dispatchers.IO) {
                         accountDao.updateItem(item = itemMaster.copy(edtxt_scm = ediScmValue))
                         accountDao.updateItem(item = itemMaster.copy(edtxt_free = 0.0))
-                        accountDao.updateItem(item = itemMaster.copy(txt_net_rate = netSaleRate))
+                        accountDao.updateItem(
+                            item = itemMaster.copy(
+                                txt_net_rate = roundValues(
+                                    netSaleRate
+                                )
+                            )
+                        )
                         accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
                     }
                     selectItemListData()
 
-                    /*TODO this is use custom margin add after use this code*/
+                    /*TODO this is use custom margin data add after change SCH edit Text  use this code*/
                     if (itemMasterList[position].edtxt_scm != 0.0
                         && itemMasterList[position].margin != itemMasterList[position].old_margin
                     ) {
-                        netSaleRate = customMarginCalculateResult(
+                        saleRate = customMarginCalculateResult(
                             itemMasterList[position].mrp,
                             itemMasterList[position].margin,
                             itemMasterList[position].edtxt_scm
                         ).toDouble()
 
-                        itemMasterList[position].txt_net_rate = netSaleRate
+                        Log.e(TAG, "onTextChanged ediMargin SaleRate:<margin> $saleRate")
+                        scmRs =
+                            (itemMasterList[position].mrp * itemMasterList[position].edtxt_scm) / 100
+                        Log.e(TAG, "onTextChanged ediMargin schRS:<ma> $scmRs")
+                        netSaleRate = itemMasterList[position].mrp - scmRs
+                        itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
                         Log.e(TAG, "onTextChanged ediMargin NetSaleRate:<ma> $netSaleRate")
-                        binding.txtNetSale.text =
-                            "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
+                        binding.txtNetSale.text = roundValues(netSaleRate).toString()
                         subTotalResult = calculateSubTotalRound(
                             netSaleRate,
                             itemMasterList[position].edtxt_qty
                         ).toString()
-                        binding.txtProductSubTotal.text =
-                            "${context.getString(R.string.rs)}" + subTotalResult
+                        binding.txtProductSubTotal.text = subTotalResult
                         itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
 
                         GlobalScope.launch(Dispatchers.IO) {
                             accountDao.updateItem(item = itemMaster.copy(margin = itemMasterList[position].margin))
+                            accountDao.updateItem(
+                                item = itemMaster.copy(
+                                    txt_net_rate = roundValues(
+                                        netSaleRate
+                                    )
+                                )
+                            )
+                            accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
+                        }
+
+                        selectItemListData()
+                    }
+                    /*TODO Scm 0 and custom margin at this time change qty= mrp/editMargin*/
+                    if (itemMasterList[position].edtxt_scm == 0.0
+                        && itemMasterList[position].margin != itemMasterList[position].old_margin
+                    ) {
+                        netSaleRate = calculateNetSaleRate(itemMaster.mrp, itemMaster.margin)
+                        itemMasterList[position].txt_net_rate = netSaleRate
+                        binding.txtNetSale.text = netSaleRate.toString()
+                        binding.txtCountQty.text =
+                            itemMasterList[position].edtxt_qty.toInt().toString()
+
+                        subTotalResult = calculateSubTotalRound(
+                            netSaleRate,
+                            itemMasterList[position].edtxt_qty
+                        ).toString()
+                        binding.txtProductSubTotal.text = subTotalResult
+                        itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
+                        GlobalScope.launch(Dispatchers.IO) {
+                            accountDao.updateItem(item = itemMaster.copy(edtxt_scm = 0.0))
+                            accountDao.updateItem(item = itemMaster.copy(edtxt_qty = itemMasterList[position].edtxt_qty))
                             accountDao.updateItem(item = itemMaster.copy(txt_net_rate = netSaleRate))
                             accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
                         }
 
                         selectItemListData()
                     }
-
-
                 } else {
                     itemMasterList[position].edtxt_scm = 0.0
                     binding.edtAddQtyFree.enabled()
@@ -693,16 +815,14 @@ class ReviewOderItemAdapter(
 
                     netSaleRate = calculateNetSaleRate(itemMaster.mrp, itemMaster.margin)
                     itemMasterList[position].txt_net_rate = netSaleRate
-                    binding.txtNetSale.text =
-                        "${context.getString(R.string.rs)}" + netSaleRate.toString()
-                    binding.txtCountQty.text = itemMasterList[position].edtxt_qty.toString()
+                    binding.txtNetSale.text = netSaleRate.toString()
+                    binding.txtCountQty.text = itemMasterList[position].edtxt_qty.toInt().toString()
 
                     subTotalResult = calculateSubTotalRound(
                         netSaleRate,
                         itemMasterList[position].edtxt_qty
                     ).toString()
-                    binding.txtProductSubTotal.text =
-                        "${context.getString(R.string.rs)}" + subTotalResult
+                    binding.txtProductSubTotal.text = subTotalResult
                     itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
 
                     GlobalScope.launch(Dispatchers.IO) {
@@ -727,7 +847,7 @@ class ReviewOderItemAdapter(
     inner class CustomMarginEditTextListener : TextWatcher {
         private var position = 0
         private lateinit var binding: ReviewOderItemRowBinding
-        lateinit var itemMaster: ItemMaster
+        private lateinit var itemMaster: ItemMaster
         fun updatePosition(
             position: Int, binding1: ReviewOderItemRowBinding, itemMaster1: ItemMaster
         ) {
@@ -748,27 +868,32 @@ class ReviewOderItemAdapter(
                 val input = charSequence.toString()
                 if (input.isNotEmpty() && input.isNotBlank() && input != "." && input != "0") {
                     var ediMargin = input.toDouble()
-
-                    if (itemMasterList[position].edtxt_scm != 0.0 && ediMargin != itemMasterList[position].old_margin) {
+                    //TODO editText SCH and custom margin use this time
+                    if (itemMasterList[position].edtxt_scm != 0.0
+                        && ediMargin != itemMasterList[position].old_margin
+                    ) {
 
                         itemMasterList[position].margin = ediMargin
 
-                        netSaleRate = customMarginCalculateResult(
+                        saleRate = customMarginCalculateResult(
                             itemMasterList[position].mrp,
                             itemMasterList[position].margin,
                             itemMasterList[position].edtxt_scm
                         ).toDouble()
 
-                        itemMasterList[position].txt_net_rate = netSaleRate
+                        Log.e(TAG, "onTextChanged ediMargin SaleRate:<margin> $saleRate")
+                        scmRs =
+                            (itemMasterList[position].mrp * itemMasterList[position].edtxt_scm) / 100
+                        Log.e(TAG, "onTextChanged ediMargin schRS:<ma> $scmRs")
+                        netSaleRate = itemMasterList[position].mrp - scmRs
+                        itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
                         Log.e(TAG, "onTextChanged ediMargin NetSaleRate:<ma> $netSaleRate")
-                        binding.txtNetSale.text =
-                            "${context.getString(R.string.rs)}" + roundValues(netSaleRate).toString()
+                        binding.txtNetSale.text = roundValues(netSaleRate).toString()
                         subTotalResult = calculateSubTotalRound(
                             netSaleRate,
                             itemMasterList[position].edtxt_qty
                         ).toString()
-                        binding.txtProductSubTotal.text =
-                            "${context.getString(R.string.rs)}" + subTotalResult
+                        binding.txtProductSubTotal.text = subTotalResult
                         itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
 
                         GlobalScope.launch(Dispatchers.IO) {
@@ -778,10 +903,11 @@ class ReviewOderItemAdapter(
                         }
 
                         selectItemListData()
-                    } else {
-
                     }
-
+                    /*TODO QTY DATA AND SCM 0 ONLY CUSTOM MARGIN */
+                    else if (itemMasterList[position].edtxt_scm == 0.0 && ediMargin != itemMasterList[position].old_margin) {
+                        customMarginOnlyQty(input)
+                    }
                 } else {
                     if (input.isEmpty() || input == "0") {
                         GlobalScope.launch(Dispatchers.IO) {
@@ -797,10 +923,32 @@ class ReviewOderItemAdapter(
                         Log.d("TextWatcher", "Text is neither empty nor '0'")
                     }
 
-
                 }
             } catch (e: NumberFormatException) {
                 Log.d(TAG, "catch onTextChanged:${e.message}")
+            }
+        }
+
+        private fun customMarginOnlyQty(customMargin: String) {
+            itemMasterList[position].margin = customMargin.toDouble()
+            netSaleRate = calculateNetSaleRate(itemMaster.mrp, customMargin.toDouble())
+            itemMasterList[position].txt_net_rate = netSaleRate
+            binding.txtNetSale.text = netSaleRate.toString()
+            binding.txtCountQty.text = itemMasterList[position].edtxt_qty.toInt().toString()
+
+            subTotalResult = calculateSubTotalRound(
+                netSaleRate,
+                itemMasterList[position].edtxt_qty
+            ).toString()
+            binding.txtProductSubTotal.text = subTotalResult
+            itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
+
+            GlobalScope.launch(Dispatchers.IO) {
+                accountDao.updateItem(item = itemMaster.copy(margin = customMargin.toDouble()))
+                accountDao.updateItem(item = itemMaster.copy(edtxt_qty = itemMasterList[position].edtxt_qty))
+                accountDao.updateItem(item = itemMaster.copy(txt_net_rate = itemMasterList[position].txt_net_rate))
+                accountDao.updateItem(item = itemMaster.copy(txt_subTotal = itemMasterList[position].txt_subTotal))
             }
         }
 
@@ -836,5 +984,10 @@ class ReviewOderItemAdapter(
 
     fun EditText.enabled() {
         this.isEnabled = true
+    }
+
+    fun setReceivePayment(receivePayment1: Double) {
+        this.receivePayment=receivePayment1
+        Log.e("TAG", "Adapter: $receivePayment" )
     }
 }

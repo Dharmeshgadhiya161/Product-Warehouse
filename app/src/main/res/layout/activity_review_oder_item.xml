@@ -51,42 +51,116 @@
     <LinearLayout
         android:id="@+id/liner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="58dp"
         android:layout_marginHorizontal="@dimen/_7sdp"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         app:layout_constraintTop_toBottomOf="@id/linerHeader">
 
-        <TextView
-            android:id="@+id/txt_medicalName"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:fontFamily="@font/roboto_medium"
-            android:gravity="left"
-            android:text="Order Review"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:layout_marginHorizontal="@dimen/_2sdp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txt_medicalAddress"
-            android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/txt_medicalName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="left"
+                android:text="Order Review"
+                android:maxLines="1"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txt_medicalAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:gravity="left"
+                android:text="Order Review"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/txt_medicalPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:gravity="left"
+                android:text="Order Review"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="left"
-            android:text="Order Review"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_transparent_rectangle"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txt_medicalPhone"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fontFamily="@font/roboto_regular"
-            android:gravity="left"
-            android:text="Order Review"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_4sdp"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="center"
+                android:includeFontPadding="false"
+                android:text="Payment Receive:- "
+                android:textColor="@color/black"
+                android:textSize="14sp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:layout_marginRight="@dimen/_2sdp"
+                    android:includeFontPadding="false"
+                    android:text="@string/rs"
+                    android:textColor="@color/green"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/edtPayReceive"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="left"
+                    android:inputType="number"
+                    android:maxLength="8"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/green"
+                    android:textColorHint="@color/green"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="@dimen/_4sdp"
+                android:layout_marginRight="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:background="@color/colorPrimary" />
+
+        </LinearLayout>
     </LinearLayout>
 
     <TableLayout
@@ -146,7 +220,18 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="0.8"
                 android:gravity="center"
-                android:text="Scm(%)"
+                android:text="Sch(%)"
+                android:textAlignment="center" />
+
+            <TextView
+                style="@style/table_header"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_26sdp"
+                android:layout_column="1"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="0.8"
+                android:gravity="center"
+                android:text="Margin"
                 android:textAlignment="center" />
 
 
@@ -187,7 +272,6 @@
         </TableRow>
     </TableLayout>
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvReviewOrderAccount"
         android:layout_width="match_parent"
@@ -203,7 +287,6 @@
         layout="@layout/layout_no_data_found"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 
     <RelativeLayout
         android:id="@+id/btn_RequestOrder"

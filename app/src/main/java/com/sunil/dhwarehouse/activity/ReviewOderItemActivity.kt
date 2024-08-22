@@ -4,6 +4,8 @@ import android.app.Activity
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -36,6 +38,8 @@ class ReviewOderItemActivity : AppCompatActivity() {
     private lateinit var selectItemList: MutableList<ItemMaster>
     private lateinit var reviewOderItemAdapter: ReviewOderItemAdapter
     private lateinit var showingDialog: ShowingDialog
+    private var receivePayment: Double = 0.0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -105,7 +109,24 @@ class ReviewOderItemActivity : AppCompatActivity() {
             onBackPressed()
         }
 
+        binding.edtPayReceive.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Optional: Handle actions before text changes
+            }
 
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Handle the text as it is being changed
+                val newValue = s.toString()
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+               receivePayment = s.toString().toDoubleOrNull() ?: 0.0
+                // Do something with the updated value
+                reviewOderItemAdapter.setReceivePayment(receivePayment)
+
+            }
+        })
     }
 
     private fun setProgressShowDialog(context: Activity, msg: String) {
@@ -117,7 +138,6 @@ class ReviewOderItemActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         UtilsFile.isChangeValues = true
-
     }
 
 }

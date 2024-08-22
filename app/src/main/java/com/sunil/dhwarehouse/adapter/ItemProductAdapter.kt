@@ -74,12 +74,6 @@ class ItemProductAdapter(
 
         holder.binding.txtTotalQty.text = itemMaster.stock_qty.toInt().toString()
 
-//        // Handle focus logic
-//        if (position == focusPosition) {
-//            Handler(Looper.getMainLooper()).post {
-//                holder.binding.edtAddQty.requestFocus()
-//            }
-//        }
         setupFocusChange(holder, holder.adapterPosition)
 
         holder.myCustomEditTextListener.updatePosition(
@@ -112,7 +106,7 @@ class ItemProductAdapter(
 
             holder.binding.ivClearProduct.visibility = View.GONE
             holder.binding.linerTotal.visibility = View.GONE
-            UtilsFile.isQtyBack = false
+           // UtilsFile.isQtyBack = false
         } else {
             holder.binding.edtAddQty.setText(
                 itemMasterList[holder.adapterPosition].edtxt_qty.toInt().toString()
@@ -133,7 +127,7 @@ class ItemProductAdapter(
             } else {
                 holder.binding.edtAddScm.setText("")
             }
-            UtilsFile.isQtyBack = false
+            UtilsFile.isQtyBack = true
             selectItemListData()
 
             holder.binding.edtAddQtyFree.enabled()
@@ -226,6 +220,7 @@ class ItemProductAdapter(
     override fun getItemCount(): Int {
         return itemMasterList.size
     }
+
     override fun onViewAttachedToWindow(holder: ViewHolder) {
         holder.enableTextWatcher()
     }
@@ -289,15 +284,11 @@ class ItemProductAdapter(
             val input = charSequence.toString()
             if (input.isNotEmpty() && input.isNotBlank() && input != ".") {
                 itemMasterList[position].edtxt_qty = input.toDouble()
-
                 //todo Free Qty values hoy tare and editText ma qty change after total Qty - Free Qty
                 if (itemMasterList[position].edtxt_free > 0.0) {
-
                     val qtyMinus = itemMaster.stock_qty - itemMaster.edtxt_free
-
                     if (qtyMinus >= input.toDouble()) {
                         freeQty = qtyMinus - input.toDouble()
-                        // freeQty = itemMaster.stock_qty - itemMaster.edtxt_free - input.toDouble()
                         binding.txtTotalQty.text = freeQty.toInt().toString()
                         Log.e(TAG, "onTextChanged freeQtyQty NetSaleRate:<freeQty> $freeQty")
                         updateQtyItem(input)
@@ -316,56 +307,36 @@ class ItemProductAdapter(
                         }
                         binding.edtAddQty.text.clear()
                     }
-                    //TODO this code use already scm values edit box add and qty values add this code use
-                } else if (itemMasterList[position].edtxt_scm > 0.0) {
-                    binding.txtCountQty.text = input
-
-                    binding.txtTotalQty.text =
-                        (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toInt()
-                            .toString()
-
-                    saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
-                    scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
-                    netSaleRate = saleRate - scmRs
-                    itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
-                    binding.txtNetSale.text = roundValues(netSaleRate).toString()
-                    subTotalResult = calculateSubTotalRound(
-                        netSaleRate,
-                        itemMasterList[position].edtxt_qty
-                    ).toString()
-                    binding.txtProductSubTotal.text = subTotalResult
-
-                    itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
-
-                    binding.edtAddQtyFree.disable()
-
-
-                    GlobalScope.launch(Dispatchers.IO) {
-                        accountDao.updateItem(item = itemMaster.copy(edtxt_qty = input.toDouble()))
-                        accountDao.updateItem(
-                            item = itemMaster.copy(
-                                txt_net_rate = roundValues(
-                                    netSaleRate
-                                )
-                            )
-                        )
-                        accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
-                    }
-
-                    binding.ivClearProduct.visibility = View.VISIBLE
-                    binding.linerTotal.visibility = View.VISIBLE
-                    btnRequestOrder.visibility = View.VISIBLE
-                } else {
+                    //TODO this code use already scm values edit box add and qty values add this code use fix Margin EditText
+                } else if (itemMasterList[position].edtxt_scm > 0.0 && itemMasterList[position].margin == itemMasterList[position].old_margin) {
                     if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
-
-                        qtyTotalStock = (itemMaster.stock_qty - itemMasterList[position].edtxt_qty)
+                        customSCHAfterChangeQTY(input)
+                    } else {
+                        afterCheckSCHAndMarginStockQTY()
+                    }
+                }
+                // TODO this code in QTY Change.custom Margin editText and SCH EditText values to use this code
+                else if (itemMasterList[position].edtxt_scm != 0.0
+                    && itemMasterList[position].margin != itemMasterList[position].old_margin
+                ) {
+                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
+                        customMarginAfterChangeQTY(input)
+                    } else {
+                        afterCheckSCHAndMarginStockQTY()
+                    }
+                }
+                else {
+                    //TODO this Code Simple qty and fix margin data work
+                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
+                        qtyTotalStock =
+                            (itemMaster.stock_qty - itemMasterList[position].edtxt_qty)
                         binding.txtTotalQty.text = qtyTotalStock.toInt().toString()
 
                         updateQtyItem(input)
 
                         selectItemListData()
                     } else {
-                        /*TODO this code Stock Qty  More Qty EditText in set Clear EditText ,All Data Clear */
+                        /*TODO this code Stock Qty  More Qty EditText in set Clear EditText,All Data Clear */
                         if (!isToastShown) {
                             ToastUtils.showCustomToast(
                                 context,
@@ -415,8 +386,6 @@ class ItemProductAdapter(
                         accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
                         // accountDao.updateItem(item = itemMaster.copy(stock_qty = itemMasterList[position].old_stockQty))
                     }
-                    //     itemMasterList[position].stock_qty = itemMasterList[position].old_stockQty
-
                     binding.txtTotalQty.text = itemMaster.stock_qty.toInt().toString()
                     binding.ivClearProduct.visibility = View.GONE
                     binding.linerTotal.visibility = View.GONE
@@ -431,6 +400,105 @@ class ItemProductAdapter(
                 selectItemListData()
 
             }
+        }
+
+        private fun afterCheckSCHAndMarginStockQTY() {
+            if (!isToastShown) {
+                ToastUtils.showCustomToast(
+                    context,
+                    "Stock QTY Available :- " + itemMasterList[position].stock_qty.toInt(),
+                    Toast.LENGTH_SHORT
+                )
+                isToastShown = true
+
+                GlobalScope.launch(Dispatchers.IO) {
+                    accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
+                    accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
+                    accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
+                    accountDao.updateItem(item = itemMaster.copy(margin = itemMasterList[position].old_margin))
+                }
+                binding.edtAddQty.text.clear()
+                binding.edtAddScm.text.clear()
+                itemMasterList[position].margin = itemMasterList[position].old_margin
+                binding.edtMargin.setText(roundValues(itemMasterList[position].margin).toString())
+                itemMasterList[position].edtxt_qty = 0.0
+                itemMasterList[position].edtxt_scm = 0.0
+                itemMasterList[position].txt_net_rate = 0.0
+                itemMasterList[position].txt_subTotal = 0.0
+            }
+        }
+
+        private fun customSCHAfterChangeQTY(edtQTYInput: String) {
+            binding.txtCountQty.text = edtQTYInput
+            Log.e(TAG, "onTextChanged:QTyEditText ${itemMasterList[position].edtxt_scm}")
+            binding.txtTotalQty.text =
+                (itemMaster.stock_qty - itemMasterList[position].edtxt_qty).toInt()
+                    .toString()
+
+            saleRate = roundValues(calculateNetSaleRate(itemMaster.mrp, itemMaster.margin))
+            scmRs = (saleRate * itemMasterList[position].edtxt_scm) / 100
+            netSaleRate = saleRate - scmRs
+            itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
+            binding.txtNetSale.text = roundValues(netSaleRate).toString()
+            subTotalResult = calculateSubTotalRound(
+                netSaleRate,
+                itemMasterList[position].edtxt_qty
+            ).toString()
+            binding.txtProductSubTotal.text = subTotalResult
+
+            itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
+            binding.edtAddQtyFree.disable()
+
+
+            GlobalScope.launch(Dispatchers.IO) {
+                accountDao.updateItem(item = itemMaster.copy(edtxt_qty = edtQTYInput.toDouble()))
+                accountDao.updateItem(
+                    item = itemMaster.copy(
+                        txt_net_rate = roundValues(
+                            netSaleRate
+                        )
+                    )
+                )
+                accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
+            }
+
+            binding.ivClearProduct.visibility = View.VISIBLE
+            binding.linerTotal.visibility = View.VISIBLE
+            btnRequestOrder.visibility = View.VISIBLE
+        }
+
+        private fun customMarginAfterChangeQTY(edtQty: String) {
+            saleRate = customMarginCalculateResult(
+                itemMasterList[position].mrp,
+                itemMasterList[position].margin,
+                itemMasterList[position].edtxt_scm
+            ).toDouble()
+
+            Log.e(TAG, "onTextChanged editQTY SaleRate:<margin> $saleRate")
+            scmRs = (itemMasterList[position].mrp *   itemMasterList[position].edtxt_scm) / 100
+            Log.e(TAG, "onTextChanged editQTY schRS:<ma> $scmRs")
+            netSaleRate = itemMasterList[position].mrp - scmRs
+            itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
+            Log.e(TAG, "onTextChanged editQTY NetSaleRate:<ma> $netSaleRate")
+            binding.txtNetSale.text = roundValues(netSaleRate).toString()
+            subTotalResult = calculateSubTotalRound(
+                netSaleRate,
+                itemMasterList[position].edtxt_qty
+            ).toString()
+            binding.txtProductSubTotal.text = subTotalResult
+            itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
+            GlobalScope.launch(Dispatchers.IO) {
+                accountDao.updateItem(item = itemMaster.copy(edtxt_qty = edtQty.toDouble()))
+                accountDao.updateItem(item = itemMaster.copy(txt_net_rate = netSaleRate))
+                accountDao.updateItem(item = itemMaster.copy(txt_subTotal = subTotalResult.toDouble()))
+            }
+
+            selectItemListData()
+            binding.ivClearProduct.visibility = View.VISIBLE
+            binding.linerTotal.visibility = View.VISIBLE
+            btnRequestOrder.visibility = View.VISIBLE
         }
 
         private fun updateQtyItem(input: String) {
@@ -609,17 +677,21 @@ class ItemProductAdapter(
                     }
                     selectItemListData()
 
-                    /*TODO this is use custom margin add after use this code*/
+                    /*TODO this is use custom margin data add after change SCH edit Text  use this code*/
                     if (itemMasterList[position].edtxt_scm != 0.0
                         && itemMasterList[position].margin != itemMasterList[position].old_margin
                     ) {
-                        netSaleRate = customMarginCalculateResult(
+                        saleRate = customMarginCalculateResult(
                             itemMasterList[position].mrp,
                             itemMasterList[position].margin,
                             itemMasterList[position].edtxt_scm
                         ).toDouble()
 
-                        itemMasterList[position].txt_net_rate = netSaleRate
+                        Log.e(TAG, "onTextChanged ediMargin SaleRate:<margin> $saleRate")
+                        scmRs = (itemMasterList[position].mrp *   itemMasterList[position].edtxt_scm) / 100
+                        Log.e(TAG, "onTextChanged ediMargin schRS:<ma> $scmRs")
+                        netSaleRate = itemMasterList[position].mrp - scmRs
+                        itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
                         Log.e(TAG, "onTextChanged ediMargin NetSaleRate:<ma> $netSaleRate")
                         binding.txtNetSale.text = roundValues(netSaleRate).toString()
                         subTotalResult = calculateSubTotalRound(
@@ -628,6 +700,7 @@ class ItemProductAdapter(
                         ).toString()
                         binding.txtProductSubTotal.text = subTotalResult
                         itemMasterList[position].txt_subTotal = subTotalResult.toDouble()
+
 
                         GlobalScope.launch(Dispatchers.IO) {
                             accountDao.updateItem(item = itemMaster.copy(margin = itemMasterList[position].margin))
@@ -669,8 +742,6 @@ class ItemProductAdapter(
 
                         selectItemListData()
                     }
-
-
                 } else {
                     itemMasterList[position].edtxt_scm = 0.0
                     binding.edtAddQtyFree.enabled()
@@ -711,7 +782,7 @@ class ItemProductAdapter(
     inner class CustomMarginEditTextListener : TextWatcher {
         private var position = 0
         private lateinit var binding: ItemProductRowBinding
-        lateinit var itemMaster: ItemMaster
+        private lateinit var itemMaster: ItemMaster
         fun updatePosition(
             position: Int, binding1: ItemProductRowBinding, itemMaster1: ItemMaster
         ) {
@@ -732,20 +803,24 @@ class ItemProductAdapter(
                 val input = charSequence.toString()
                 if (input.isNotEmpty() && input.isNotBlank() && input != "." && input != "0") {
                     var ediMargin = input.toDouble()
-
+                    //TODO editText SCH and custom margin use this time
                     if (itemMasterList[position].edtxt_scm != 0.0
                         && ediMargin != itemMasterList[position].old_margin
                     ) {
 
                         itemMasterList[position].margin = ediMargin
 
-                        netSaleRate = customMarginCalculateResult(
+                        saleRate = customMarginCalculateResult(
                             itemMasterList[position].mrp,
                             itemMasterList[position].margin,
                             itemMasterList[position].edtxt_scm
                         ).toDouble()
 
-                        itemMasterList[position].txt_net_rate = netSaleRate
+                        Log.e(TAG, "onTextChanged ediMargin SaleRate:<margin> $saleRate")
+                        scmRs = (itemMasterList[position].mrp *   itemMasterList[position].edtxt_scm) / 100
+                        Log.e(TAG, "onTextChanged ediMargin schRS:<ma> $scmRs")
+                        netSaleRate = itemMasterList[position].mrp - scmRs
+                        itemMasterList[position].txt_net_rate = roundValues(netSaleRate)
                         Log.e(TAG, "onTextChanged ediMargin NetSaleRate:<ma> $netSaleRate")
                         binding.txtNetSale.text = roundValues(netSaleRate).toString()
                         subTotalResult = calculateSubTotalRound(
@@ -764,10 +839,9 @@ class ItemProductAdapter(
                         selectItemListData()
                     }
                     /*TODO QTY DATA AND SCM 0 ONLY CUSTOM MARGIN */
-                    if (itemMasterList[position].edtxt_scm == 0.0 && ediMargin != itemMasterList[position].old_margin) {
+                    else if (itemMasterList[position].edtxt_scm == 0.0 && ediMargin != itemMasterList[position].old_margin) {
                         customMarginOnlyQty(input)
                     }
-
                 } else {
                     if (input.isEmpty() || input == "0") {
                         GlobalScope.launch(Dispatchers.IO) {
