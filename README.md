@@ -1,3 +1,3 @@
 ## Dealer to medical cosmetics products supplier Oder  Android Application ##
 This Product Privat uses an App.
-This custom private App makes to contact us.
+Contact us quickly using this custom-made private app
