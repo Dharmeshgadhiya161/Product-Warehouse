@@ -76,10 +76,6 @@ class ItemProductAdapter(
 
         setupFocusChange(holder, holder.adapterPosition)
 
-        holder.myCustomEditTextListener.updatePosition(
-            holder.adapterPosition, holder.binding, itemMaster
-        )
-
         holder.freeQtyEditTextListener.updatePosition(
             holder.adapterPosition, holder.binding, itemMaster
         )
@@ -164,9 +160,9 @@ class ItemProductAdapter(
             }
 
             /*===================================================================*/
-            /*TODO  this code use to custom change margin values after clear data old margin set */
+            /*TODO  This code use to custom change margin values after clear data old margin set */
             GlobalScope.launch(Dispatchers.IO) {
-                accountDao.updateItem(item = itemMaster.copy(margin = itemMasterList[position].old_margin))
+                account do.update item(item = itemMaster.copy(margin = itemMasterList[position].old_margin))
             }
             itemMasterList[position].margin = itemMasterList[position].old_margin
             holder.binding.edtMargin.setText(roundValues(itemMasterList[holder.adapterPosition].margin).toString())
@@ -231,28 +227,27 @@ class ItemProductAdapter(
 
     class ViewHolder(
         val binding: ItemProductRowBinding,
-        var myCustomEditTextListener: MyCustomEditTextListener,
         var freeQtyEditTextListener: FreeQtyEditTextListener,
         var scmRsEditTextListener: ScmRsEditTextListener,
         var customMarginEditTextListener: CustomMarginEditTextListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.edtAddQty.addTextChangedListener(myCustomEditTextListener)
+         
             binding.edtAddQtyFree.addTextChangedListener(freeQtyEditTextListener)
             binding.edtAddScm.addTextChangedListener(scmRsEditTextListener)
             binding.edtMargin.addTextChangedListener(customMarginEditTextListener)
         }
 
         fun enableTextWatcher() {
-            binding.edtAddQty.addTextChangedListener(myCustomEditTextListener)
+         
             binding.edtAddQtyFree.addTextChangedListener(freeQtyEditTextListener)
             binding.edtAddScm.addTextChangedListener(scmRsEditTextListener)
             binding.edtMargin.addTextChangedListener(customMarginEditTextListener)
         }
 
         fun disableTextWatcher() {
-            binding.edtAddQty.removeTextChangedListener(myCustomEditTextListener)
+         
             binding.edtAddQtyFree.removeTextChangedListener(freeQtyEditTextListener)
             binding.edtAddScm.removeTextChangedListener(scmRsEditTextListener)
             binding.edtMargin.removeTextChangedListener(customMarginEditTextListener)
@@ -261,146 +256,7 @@ class ItemProductAdapter(
 
     }
 
-    inner class MyCustomEditTextListener : TextWatcher {
-        private var position = 0
-        private lateinit var binding: ItemProductRowBinding
-        private lateinit var itemMaster: ItemMaster
-        fun updatePosition(
-            position: Int, binding1: ItemProductRowBinding, itemMaster1: ItemMaster
-        ) {
-            this.position = position
-            this.binding = binding1
-            this.itemMaster = itemMaster1
-        }
-
-        override fun beforeTextChanged(
-            charSequence: CharSequence, start: Int, count: Int, after: Int
-        ) {
-        }
-
-        override fun onTextChanged(
-            charSequence: CharSequence, start: Int, before: Int, count: Int
-        ) {
-            val input = charSequence.toString()
-            if (input.isNotEmpty() && input.isNotBlank() && input != ".") {
-                itemMasterList[position].edtxt_qty = input.toDouble()
-                //todo Free Qty values hoy tare and editText ma qty change after total Qty - Free Qty
-                if (itemMasterList[position].edtxt_free > 0.0) {
-                    val qtyMinus = itemMaster.stock_qty - itemMaster.edtxt_free
-                    if (qtyMinus >= input.toDouble()) {
-                        freeQty = qtyMinus - input.toDouble()
-                        binding.txtTotalQty.text = freeQty.toInt().toString()
-                        Log.e(TAG, "onTextChanged freeQtyQty NetSaleRate:<freeQty> $freeQty")
-                        updateQtyItem(input)
-                    } else {
-                        ToastUtils.showCustomToast(
-                            context,
-                            "Stock QTY Available :- " + itemMasterList[position].stock_qty.toInt(),
-                            Toast.LENGTH_SHORT
-                        )
-                        isToastShown = true
-
-                        GlobalScope.launch(Dispatchers.IO) {
-                            accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
-                            accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
-                            accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
-                        }
-                        binding.edtAddQty.text.clear()
-                    }
-                    //TODO this code use already scm values edit box add and qty values add this code use fix Margin EditText
-                } else if (itemMasterList[position].edtxt_scm > 0.0 && itemMasterList[position].margin == itemMasterList[position].old_margin) {
-                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
-                        customSCHAfterChangeQTY(input)
-                    } else {
-                        afterCheckSCHAndMarginStockQTY()
-                    }
-                }
-                // TODO this code in QTY Change.custom Margin editText and SCH EditText values to use this code
-                else if (itemMasterList[position].edtxt_scm != 0.0
-                    && itemMasterList[position].margin != itemMasterList[position].old_margin
-                ) {
-                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
-                        customMarginAfterChangeQTY(input)
-                    } else {
-                        afterCheckSCHAndMarginStockQTY()
-                    }
-                }
-                else {
-                    //TODO this Code Simple qty and fix margin data work
-                    if (itemMasterList[position].stock_qty >= itemMasterList[position].edtxt_qty) {
-                        qtyTotalStock =
-                            (itemMaster.stock_qty - itemMasterList[position].edtxt_qty)
-                        binding.txtTotalQty.text = qtyTotalStock.toInt().toString()
-
-                        updateQtyItem(input)
-
-                        selectItemListData()
-                    } else {
-                        /*TODO this code Stock Qty  More Qty EditText in set Clear EditText,All Data Clear */
-                        if (!isToastShown) {
-                            ToastUtils.showCustomToast(
-                                context,
-                                "Stock QTY Available :- " + itemMasterList[position].stock_qty.toInt(),
-                                Toast.LENGTH_SHORT
-                            )
-                            isToastShown = true
-
-                            GlobalScope.launch(Dispatchers.IO) {
-                                accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
-                                accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
-                                accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
-                            }
-                            binding.edtAddQty.text.clear()
-
-                            itemMasterList[position].edtxt_qty = 0.0
-                            itemMasterList[position].txt_net_rate = 0.0
-                            itemMasterList[position].txt_subTotal = 0.0
-                        }
-                    }
-                }
-            } else {
-                //TODO use to if free edit text data hoy ne and qty data 0 hoy tare total qty data update
-                if (itemMasterList[position].edtxt_free > 0.0) {
-                    freeQty = itemMaster.stock_qty - itemMaster.edtxt_free
-                    binding.txtTotalQty.text = freeQty.toInt().toString()
-
-                    GlobalScope.launch(Dispatchers.IO) {
-                        accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
-                        accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
-                        accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
-                    }
-
-                    binding.ivClearProduct.visibility = View.GONE
-                    binding.linerTotal.visibility = View.GONE
-
-                    itemMasterList[position].edtxt_qty = 0.0
-                    itemMasterList[position].txt_net_rate = 0.0
-                    itemMasterList[position].txt_subTotal = 0.0
-
-                    selectItemList.remove(itemMaster)
-                } else {
-
-                    GlobalScope.launch(Dispatchers.IO) {
-                        accountDao.updateItem(item = itemMaster.copy(edtxt_qty = 0.0))
-                        accountDao.updateItem(item = itemMaster.copy(txt_net_rate = 0.0))
-                        accountDao.updateItem(item = itemMaster.copy(txt_subTotal = 0.0))
-                        // accountDao.updateItem(item = itemMaster.copy(stock_qty = itemMasterList[position].old_stockQty))
-                    }
-                    binding.txtTotalQty.text = itemMaster.stock_qty.toInt().toString()
-                    binding.ivClearProduct.visibility = View.GONE
-                    binding.linerTotal.visibility = View.GONE
-
-                    itemMasterList[position].edtxt_qty = 0.0
-                    itemMasterList[position].txt_net_rate = 0.0
-                    itemMasterList[position].txt_subTotal = 0.0
-
-                    selectItemList.remove(itemMaster)
-                }
-
-                selectItemListData()
-
-            }
-        }
+    
 
         private fun afterCheckSCHAndMarginStockQTY() {
             if (!isToastShown) {
