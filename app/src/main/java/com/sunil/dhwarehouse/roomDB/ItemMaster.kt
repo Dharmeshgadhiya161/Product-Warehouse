@@ -16,9 +16,7 @@ data class ItemMaster(
     var margin: Double = 0.0,
     var stock_qty: Double = 0.0,
     var stock_amount: Double = 0.0,
-    var edtxt_qty: Double = 0.0,
-    var edtxt_free: Double = 0.0,
-    var edtxt_scm: Double = 0.0,
+   
     var txt_net_rate: Double = 0.0,
     var txt_subTotal: Double = 0.0,
     var old_margin: Double = 0.0,
