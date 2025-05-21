@@ -12,6 +12,8 @@ place orders, and manage transactions efficiently while providing suppliers with
 This Product Privat uses an App.
 Contact us quickly using this custom-made private app
 
+dharmeshgadhiya161@gmail.com
+
 ### 🌐 Connect with me:
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dharmesh-gadhiya161)
 [![Email](https://img.shields.io/badge/Email-D14836?style=flat&logo=gmail&logoColor=white)](mailto:dharmeshgadhiya161@gmail.com)
