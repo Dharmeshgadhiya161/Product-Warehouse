@@ -1,17 +1,17 @@
-## Dealer to medical cosmetics products supplier Order Android Application ##
+##  Medical Cosmetics Dealer Ordering App ##
 🚀 Android Developer | 📱 Java/Kotlin Enthusiast | 💼 Freelancer  
 
 Project description.
 
-This Android application facilitates seamless order management between dealers and medical cosmetics product suppliers.
-The app will enable dealers to browse Medical details, Filter data, Search data, category-wise products,
-place orders, and manage transactions efficiently while providing suppliers with order management and Order Bill files (CSV and PDF).
+A streamlined Android application designed to connect dealers with medical cosmetics product suppliers.
+Dealers can easily explore product catalogs, filter and search items, browse category-wise listings, and place accurate orders.
+Suppliers gain access to powerful order management tools along with automated order bill generation in CSV and PDF formats for seamless processing and record-keeping.
 
+This app is excellent for small businesses, wholesalers, and distributors, offering features like real-time order status tracking, GST-compliant invoicing, delivery challan generation, and offline functionality.
 
+**App demo available — contact us directly via email.!!**
 
-This Product Privat uses an App.
 Contact us quickly using this custom-made private app
-
 dharmeshgadhiya161@gmail.com
 
 ### 🌐 Connect with me:
