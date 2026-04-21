@@ -65,7 +65,7 @@ Designed for small businesses, wholesalers, and distributors to digitize and opt
 Android Developer | AI/ML Engineer
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dharmesh-gadhiya161)
-🔗 LinkedIn: https://linkedin.com/in/dharmesh-gadhiya161
+🔗 [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dharmesh-gadhiya161): https://linkedin.com/in/dharmesh-gadhiya161
   
 ---
 
