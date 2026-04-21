@@ -64,11 +64,9 @@ Designed for small businesses, wholesalers, and distributors to digitize and opt
 **Dharmesh Gadhiya**
 Android Developer | AI/ML Engineer
 
-🔗 Connect with me: [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dharmesh-gadhiya161) | https://linkedin.com/in/dharmesh-gadhiya161
+🔗 Connect with me: https://linkedin.com/in/dharmesh-gadhiya161
+  [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dharmesh-gadhiya161) 
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dharmesh-gadhiya161)
-🔗 [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/dharmesh-gadhiya161): https://linkedin.com/in/dharmesh-gadhiya161
-  
 ---
 
 ⭐ If you find this project useful, consider giving it a star!
